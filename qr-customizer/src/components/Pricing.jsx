@@ -24,9 +24,9 @@ export default function Pricing() {
 
                         <ul className="space-y-4 mb-8 flex-1">
                             {[
-                                "3 QR code previews",
+                                "QR code preview",
+                                "PNG & SVG download",
                                 "Basic black & white style",
-                                "Low-resolution PNG (300px)",
                             ].map(item => (
                                 <li key={item} className="flex items-center gap-3 text-textSecondary text-sm">
                                     <svg className="w-5 h-5 text-success/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
@@ -36,7 +36,7 @@ export default function Pricing() {
                             {[
                                 "Custom colors",
                                 "Logo upload",
-                                "High-res download"
+                                "High-res download (watermark-free)"
                             ].map(item => (
                                 <li key={item} className="flex items-center gap-3 text-textDisabled text-sm">
                                     <svg className="w-5 h-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -65,11 +65,11 @@ export default function Pricing() {
                         <ul className="space-y-4 mb-8 flex-1">
                             {[
                                 "Full color customization",
-                                "Logo/image in center",
-                                "High-res PNG (2000px)",
-                                "SVG vector format",
-                                "No watermark",
-                                "Instant download"
+                                "Logo in center",
+                                "High-res PNG (2000px) + SVG",
+                                "Watermark-free download",
+                                "All dot styles",
+                                "Instant clean download"
                             ].map(item => (
                                 <li key={item} className="flex items-center gap-3 text-textLight text-[15px]">
                                     <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center shrink-0">

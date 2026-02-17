@@ -66,16 +66,96 @@ export default function Preview({ config, updateConfig }) {
     }, [config, qrCode])
 
     const handleDownload = (format) => {
-        if (!config.hasPaid) {
-            setShowPaywall(true)
+        // PRO USER: Instant download, no watermark
+        if (config.hasPaid) {
+            qrCode.download({
+                name: "qrcraft-code",
+                extension: format
+            })
             return
         }
 
-        // Show spinner logic could go here
-        qrCode.download({
-            name: "my-qr-code",
-            extension: format
-        })
+        // FREE USER: Add watermark
+        if (format === 'png') {
+            qrCode.getRawData("png").then((blob) => {
+                const url = URL.createObjectURL(blob)
+                const img = new Image()
+                img.onload = () => {
+                    const watermarkHeight = 28
+                    const canvas = document.createElement("canvas")
+                    canvas.width = img.width
+                    canvas.height = img.height + watermarkHeight
+                    const ctx = canvas.getContext("2d")
+
+                    // Draw white background
+                    ctx.fillStyle = "#ffffff"
+                    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+                    // Draw the QR code image on top
+                    ctx.drawImage(img, 0, 0)
+
+                    // Draw the watermark bar below the QR
+                    ctx.fillStyle = "#f4f4f8"
+                    ctx.fillRect(0, img.height, canvas.width, watermarkHeight)
+
+                    ctx.fillStyle = "#9999bb"
+                    ctx.font = "500 11px 'DM Sans', sans-serif"
+                    ctx.textAlign = "center"
+                    ctx.textBaseline = "middle"
+                    ctx.fillText(
+                        "Made with qrcraft.fun",
+                        canvas.width / 2,
+                        img.height + watermarkHeight / 2
+                    )
+
+                    canvas.toBlob((outputBlob) => {
+                        const downloadUrl = URL.createObjectURL(outputBlob)
+                        const a = document.createElement("a")
+                        a.href = downloadUrl
+                        a.download = "qrcraft-free.png"
+                        a.click()
+                        URL.revokeObjectURL(downloadUrl)
+                        URL.revokeObjectURL(url)
+                    }, "image/png")
+                }
+                img.src = url
+            })
+        } else if (format === 'svg') {
+            qrCode.getRawData("svg").then((blob) => {
+                blob.text().then(svgText => {
+                    const qrSize = 2000 // Based on init config
+                    const watermarkSvg = `
+                        <rect x="0" y="${qrSize}" width="${qrSize}" height="24" fill="#f4f4f8"/>
+                        <text
+                            x="${qrSize / 2}"
+                            y="${qrSize + 16}"
+                            text-anchor="middle"
+                            font-family="DM Sans, sans-serif"
+                            font-size="11"
+                            fill="#9999bb"
+                        >Made with qrcraft.fun</text>`
+
+                    // Inject before closing tag
+                    const newSvgText = svgText.replace('</svg>', `${watermarkSvg}</svg>`)
+                    // Update viewBox to include watermark
+                    const updatedSvgText = newSvgText.replace(/viewBox="0 0 (\d+) (\d+)"/, (match, w, h) => {
+                        return `viewBox="0 0 ${w} ${parseInt(h) + 24}"`
+                    })
+                    // Update height attribute
+                    const finalSvgText = updatedSvgText.replace(/height="(\d+)"/, (match, h) => {
+                        return `height="${parseInt(h) + 24}"`
+                    })
+
+                    const newBlob = new Blob([finalSvgText], { type: "image/svg+xml" })
+                    const url = URL.createObjectURL(newBlob)
+                    const a = document.createElement("a")
+                    a.href = url
+                    a.download = "qrcraft-free.svg"
+                    a.click()
+                    URL.revokeObjectURL(url)
+                })
+            })
+        }
     }
 
     return (
@@ -92,6 +172,30 @@ export default function Preview({ config, updateConfig }) {
                         ref={qrRef}
                         className={`w-[276px] h-[276px] [&>svg]:w-full [&>svg]:h-full overflow-hidden transition-all duration-200 ${isUpdating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}
                     />
+
+                    {/* Watermark for Free Users */}
+                    {!config.hasPaid && (
+                        <div style={{
+                            width: '100%',
+                            textAlign: 'center',
+                            padding: '6px 0',
+                            backgroundColor: '#f4f4f8',
+                            borderRadius: '0 0 12px 12px',
+                            marginTop: '-12px',
+                            position: 'relative',
+                            zIndex: 20
+                        }}>
+                            <span style={{
+                                fontSize: '11px',
+                                color: '#9999bb',
+                                fontFamily: 'DM Sans, sans-serif',
+                                fontWeight: 500,
+                                letterSpacing: '0.02em',
+                            }}>
+                                Made with qrcraft.fun
+                            </span>
+                        </div>
+                    )}
 
                     <div className="mt-6 flex items-center justify-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
