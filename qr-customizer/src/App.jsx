@@ -6,18 +6,26 @@ import UseCases from './components/UseCases'
 import Pricing from './components/Pricing'
 import FAQ from './components/FAQ'
 import Footer from './components/Footer'
+import About from './components/About' // New page
+import Dashboard from './components/Dashboard' // New page
+import Analytics from './components/Analytics' // New page
 import { useQRConfig } from './hooks/useQRConfig'
 
 export default function App() {
   const { config, updateConfig } = useQRConfig()
   const [showScrollTop, setShowScrollTop] = useState(false)
 
+  // Navigation State
+  const [currentPage, setCurrentPage] = useState('home') // 'home', 'about', 'dashboard', 'analytics'
+
+  // Dynamic QR Codes State (Client-side mock DB)
+  const [dynamicCodes, setDynamicCodes] = useState([])
+
   // Step 5: Stripe Integration
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('paid') === 'true') {
       updateConfig('hasPaid', true)
-      // Clean the URL
       window.history.replaceState({}, '', '/')
     }
   }, [updateConfig])
@@ -35,26 +43,53 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Render the current page content
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'about':
+        return <About setCurrentPage={setCurrentPage} />
+      case 'dashboard':
+        return <Dashboard dynamicCodes={dynamicCodes} setDynamicCodes={setDynamicCodes} setCurrentPage={setCurrentPage} />
+      case 'analytics':
+        return <Analytics hasPaid={config.hasPaid} setCurrentPage={setCurrentPage} />
+      case 'home':
+      default:
+        return (
+          <>
+            <div id="how-it-works">
+              <Hero setCurrentPage={setCurrentPage} />
+            </div>
+
+            <section id="tool" className="py-20 px-4 max-w-7xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Create Your Custom QR Code</h2>
+                <p className="text-gray-400">Design, customize, and download in seconds.</p>
+              </div>
+              <QRTool
+                config={config}
+                updateConfig={updateConfig}
+                dynamicCodes={dynamicCodes}
+                setDynamicCodes={setDynamicCodes}
+              />
+            </section>
+
+            <UseCases />
+            <Pricing />
+            <FAQ />
+          </>
+        )
+    }
+  }
+
   return (
     <div className="bg-dark text-textLight min-h-screen font-inter">
-      <Header />
+      <Header currentPage={currentPage} setCurrentPage={setCurrentPage} hasDynamicCodes={dynamicCodes.length > 0} />
 
-      <div id="how-it-works">
-        <Hero />
-      </div>
+      <main>
+        {renderPage()}
+      </main>
 
-      <section id="tool" className="py-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Create Your Custom QR Code</h2>
-          <p className="text-gray-400">Design, customize, and download in seconds.</p>
-        </div>
-        <QRTool config={config} updateConfig={updateConfig} />
-      </section>
-
-      <UseCases />
-      <Pricing />
-      <FAQ />
-      <Footer />
+      <Footer setCurrentPage={setCurrentPage} />
 
       {/* Floating Back to Top Button */}
       <button

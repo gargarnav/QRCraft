@@ -1,25 +1,34 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChromePicker } from 'react-color'
+import { nanoid } from 'nanoid'
 
-export default function Controls({ config, updateConfig }) {
+export default function Controls({ config, updateConfig, dynamicCodes, setDynamicCodes }) {
     const [showFgPicker, setShowFgPicker] = useState(false)
     const [showBgPicker, setShowBgPicker] = useState(false)
     const [localContent, setLocalContent] = useState(config.content)
     const [wifiSsid, setWifiSsid] = useState('')
     const [wifiPass, setWifiPass] = useState('')
 
+    // Dynamic QR State
+    const [isDynamic, setIsDynamic] = useState(false)
+    const [qrName, setQrName] = useState('')
+    const [hasGeneratedDynamic, setHasGeneratedDynamic] = useState(false)
+
     useEffect(() => {
         setLocalContent(config.content)
     }, [config.content])
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (config.qrType !== 'wifi') {
-                updateConfig('content', localContent)
-            }
-        }, 300)
-        return () => clearTimeout(timer)
-    }, [localContent, config.qrType])
+        // Debounce content updates only if NOT dynamic (because dynamic updates manually)
+        if (!isDynamic) {
+            const timer = setTimeout(() => {
+                if (config.qrType !== 'wifi') {
+                    updateConfig('content', localContent)
+                }
+            }, 300)
+            return () => clearTimeout(timer)
+        }
+    }, [localContent, config.qrType, isDynamic])
 
     useEffect(() => {
         if (config.qrType === 'wifi') {
@@ -41,6 +50,29 @@ export default function Controls({ config, updateConfig }) {
         }
     }
 
+    const handleCreateDynamic = () => {
+        const shortcode = nanoid(6)
+        const redirectUrl = `https://qrcraft.fun/r/${shortcode}`
+
+        // Update QR content to the short URL
+        updateConfig('content', redirectUrl)
+        setLocalContent(redirectUrl)
+
+        // Save to "Simulated DB"
+        if (setDynamicCodes) {
+            const newCode = {
+                shortcode,
+                name: qrName || 'Untitled Dynamic QR',
+                destination: localContent, // The actual destination
+                createdAt: new Date().toISOString()
+            }
+            setDynamicCodes(prev => [newCode, ...prev])
+        }
+
+        setHasGeneratedDynamic(true)
+        // TODO: Save to database via POST /api/qr/create-dynamic
+    }
+
     // Common input classes
     const inputClass = "w-full bg-dark border border-border focus:border-primary focus:ring-4 focus:ring-primary/15 rounded-xl px-4 py-3 text-textLight placeholder-textMuted outline-none transition-all font-mono text-sm shadow-sm"
     const labelClass = "block text-xs font-medium text-textMuted uppercase tracking-wider mb-2"
@@ -57,8 +89,8 @@ export default function Controls({ config, updateConfig }) {
                             key={type}
                             onClick={() => updateConfig('qrType', type)}
                             className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all capitalize whitespace-nowrap ${config.qrType === type
-                                    ? 'bg-primary text-white shadow-md'
-                                    : 'text-textMuted hover:text-white hover:bg-white/5'
+                                ? 'bg-primary text-white shadow-md'
+                                : 'text-textMuted hover:text-white hover:bg-white/5'
                                 }`}
                         >
                             {type === 'url' ? 'URL' : type === 'wifi' ? 'WiFi' : type}
@@ -67,10 +99,49 @@ export default function Controls({ config, updateConfig }) {
                 </div>
             </div>
 
+            {/* DYNAMIC QR TOGGLE (Only for URL type) */}
+            {config.qrType === 'url' && (
+                <div className={`p-4 rounded-xl border transition-all ${isDynamic ? 'bg-primary/5 border-primary' : 'bg-dark-raised border-border'}`}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDynamic ? 'bg-primary text-white' : 'bg-dark border border-border text-textMuted'}`}>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-white text-sm">Dynamic QR</h4>
+                                <p className="text-xs text-textSecondary">Update destination later</p>
+                            </div>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" className="sr-only peer" checked={isDynamic} onChange={() => setIsDynamic(!isDynamic)} />
+                            <div className="w-11 h-6 bg-dark-raised peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+
+                    {isDynamic && (
+                        <div className="mt-4 space-y-3 animate-fade-in">
+                            <input
+                                type="text"
+                                placeholder="QR Name (e.g. Menu)"
+                                value={qrName}
+                                onChange={(e) => setQrName(e.target.value)}
+                                className={inputClass}
+                            />
+                            {hasGeneratedDynamic && (
+                                <div className="text-green-400 text-xs flex items-center gap-1 bg-green-400/10 p-2 rounded-lg border border-green-400/20">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                    Dynamic QR created! Check Dashboard.
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Content Input */}
             <div>
                 <label className={labelClass}>
-                    {config.qrType === 'url' ? 'Website URL' :
+                    {config.qrType === 'url' ? 'Destination URL' :
                         config.qrType === 'text' ? 'Text Content' :
                             config.qrType === 'email' ? 'Email Address' :
                                 config.qrType === 'phone' ? 'Phone Number' : 'Network Details'}
@@ -94,17 +165,27 @@ export default function Controls({ config, updateConfig }) {
                         />
                     </div>
                 ) : (
-                    <input
-                        type="text"
-                        value={localContent}
-                        onChange={(e) => setLocalContent(e.target.value)}
-                        placeholder={
-                            config.qrType === 'url' ? 'https://yourwebsite.com' :
-                                config.qrType === 'email' ? 'name@example.com' :
-                                    config.qrType === 'phone' ? '+1 234 567 8900' : 'Enter text'
-                        }
-                        className={inputClass}
-                    />
+                    <div className="space-y-3">
+                        <input
+                            type="text"
+                            value={localContent}
+                            onChange={(e) => setLocalContent(e.target.value)}
+                            placeholder={
+                                config.qrType === 'url' ? 'https://yourwebsite.com' :
+                                    config.qrType === 'email' ? 'name@example.com' :
+                                        config.qrType === 'phone' ? '+1 234 567 8900' : 'Enter text'
+                            }
+                            className={inputClass}
+                        />
+                        {isDynamic && !hasGeneratedDynamic && (
+                            <button
+                                onClick={handleCreateDynamic}
+                                className="w-full bg-primary hover:bg-primary-dim text-white font-bold py-3 rounded-xl transition-all shadow-glow hover:shadow-glow-strong"
+                            >
+                                Generate Dynamic QR
+                            </button>
+                        )}
+                    </div>
                 )}
             </div>
 
@@ -168,8 +249,8 @@ export default function Controls({ config, updateConfig }) {
                             key={style}
                             onClick={() => updateConfig('dotStyle', style)}
                             className={`flex-shrink-0 w-14 h-14 rounded-xl border-2 flex items-center justify-center transition-all ${config.dotStyle === style
-                                    ? 'border-primary bg-primary/10 shadow-glow'
-                                    : 'border-border bg-dark-raised hover:border-textMuted'
+                                ? 'border-primary bg-primary/10 shadow-glow'
+                                : 'border-border bg-dark-raised hover:border-textMuted'
                                 }`}
                             title={style}
                         >
@@ -193,8 +274,8 @@ export default function Controls({ config, updateConfig }) {
                             key={style}
                             onClick={() => updateConfig('cornerStyle', style)}
                             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${config.cornerStyle === style
-                                    ? 'bg-primary text-white shadow-md'
-                                    : 'text-textMuted hover:text-white'
+                                ? 'bg-primary text-white shadow-md'
+                                : 'text-textMuted hover:text-white'
                                 }`}
                         >
                             {style === 'square' ? 'Square' : 'Rounded'}
@@ -273,8 +354,8 @@ export default function Controls({ config, updateConfig }) {
                             key={level}
                             onClick={() => updateConfig('errorCorrection', level)}
                             className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${config.errorCorrection === level
-                                    ? 'bg-primary text-white shadow-md'
-                                    : 'text-textMuted hover:text-white'
+                                ? 'bg-primary text-white shadow-md'
+                                : 'text-textMuted hover:text-white'
                                 }`}
                         >
                             {level}

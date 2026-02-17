@@ -1,0 +1,646 @@
+================================================================================
+         QRCRAFT — FEATURE EXPANSION & ABOUT PAGE BLUEPRINT
+         Dynamic QR Codes · Scan Analytics · About Arnav Garg
+================================================================================
+
+Document Type: Feature Expansion Guide + About Page Copy
+Built for: qrcraft.fun
+Founder: Arnav Garg — First Year Student, BITS Pilani
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+  1. DYNAMIC QR CODES — Full Feature Spec
+  2. SCAN ANALYTICS — Full Feature Spec
+  3. NEW PRICING TIERS (updated for new features)
+  4. BACKEND REQUIREMENTS (minimal — what you now need)
+  5. ABOUT PAGE — Full Copy & Layout
+  6. CURSOR PROMPT — Build all of this
+
+================================================================================
+SECTION 1 — DYNAMIC QR CODES
+================================================================================
+
+WHAT IT IS:
+───────────
+  A Dynamic QR code looks identical to a static one when printed.
+  The difference: instead of encoding the destination URL directly,
+  it encodes a SHORT REDIRECT URL that YOU control.
+
+  Example:
+    Static QR:  encodes → https://myrestaurant.com/menu-v1.pdf
+    Dynamic QR: encodes → https://qrcraft.fun/r/xK9mP2
+                          (your redirect URL)
+                          which redirects to → https://myrestaurant.com/menu-v1.pdf
+
+  The user can log into QRcraft, edit the destination of xK9mP2,
+  and the SAME printed QR code now points somewhere new.
+  No reprinting. No new QR code. Magic.
+
+WHY USERS WILL PAY FOR THIS:
+──────────────────────────────
+  - Restaurant updates their menu → no reprint needed
+  - Event changes venue → update the QR, same flyers
+  - Freelancer updates portfolio → same business card QR
+  - This is the #1 upsell feature in the QR code industry
+
+HOW IT WORKS TECHNICALLY:
+──────────────────────────
+  1. User creates a Dynamic QR code (paid feature)
+  2. Backend creates a redirect record:
+       id: "xK9mP2"
+       destination: "https://user-entered-url.com"
+       owner: user_id
+       created_at: timestamp
+  3. QR code encodes: https://qrcraft.fun/r/xK9mP2
+  4. When someone scans it, they hit your server at /r/xK9mP2
+  5. Server looks up the destination and does a 302 redirect
+  6. User can update the destination anytime from their dashboard
+
+BACKEND NEEDED:
+  - A simple redirect endpoint: GET /r/:shortcode → 302 to destination
+  - A database table: { shortcode, destination, user_id, created_at }
+  - An auth system (simple email/password or Google OAuth)
+  - A dashboard page where users manage their dynamic QR codes
+
+RECOMMENDED STACK FOR THIS:
+  - Supabase (free tier): handles database + auth + API in one
+  - Vercel Edge Functions: handles the /r/:shortcode redirect (fast, free)
+  - OR: Keep on Replit and use a simple Express route + MongoDB Atlas (free)
+
+SHORTCODE GENERATION:
+  Use nanoid (npm package) to generate 6-character random IDs
+  import { nanoid } from 'nanoid'
+  const shortcode = nanoid(6) // e.g. "xK9mP2"
+  Collision probability at 6 chars (alphanumeric): negligible for MVP scale
+
+REDIRECT PERFORMANCE:
+  The redirect must be FAST — under 100ms — or users will feel lag when scanning.
+  Use Vercel Edge Functions (runs at the CDN edge, globally fast) for /r/:shortcode.
+  Cache the destination URL in memory for 60 seconds to reduce DB reads.
+
+USER DASHBOARD (new page: /dashboard):
+────────────────────────────────────────
+  Shows all of the user's dynamic QR codes in a table:
+
+  | QR Name        | Shortcode  | Destination URL           | Scans | Last Scan  | Actions     |
+  |----------------|------------|---------------------------|-------|------------|-------------|
+  | Restaurant Menu| xK9mP2     | myrestaurant.com/menu.pdf | 142   | 2 hrs ago  | Edit Delete |
+  | Business Card  | aB3nZ7     | linkedin.com/in/arnavrg   | 38    | 1 day ago  | Edit Delete |
+
+  "Edit" opens a modal to change the destination URL.
+  "Delete" removes the redirect (scanning the QR will show a 404).
+
+  Each row has a mini QR code thumbnail (click to download again).
+
+  Top of dashboard:
+    "You have X dynamic QR codes. Upgrade to Pro for unlimited."
+    Free tier: 1 dynamic QR code max
+    Pro tier: unlimited
+
+FEATURE SPEC SUMMARY:
+──────────────────────
+  Free tier:    Static QR codes only (no dynamic)
+  Pro ($2.99):  1 dynamic QR code + unlimited static
+  Pro+ ($9.99): Unlimited dynamic QR codes + analytics (see Section 2)
+
+================================================================================
+SECTION 2 — SCAN ANALYTICS
+================================================================================
+
+WHAT IT IS:
+───────────
+  Every time someone scans a Dynamic QR code, QRcraft logs the scan event.
+  The owner can view a dashboard showing:
+    - Total scan count
+    - Scans over time (line chart)
+    - Device type breakdown (mobile vs desktop)
+    - Browser breakdown (Chrome, Safari, etc.)
+    - Country breakdown (where scans happened)
+    - Top scanning hours (heatmap)
+
+  This is ONLY available for paid users (Pro+ / $9.99 tier).
+  Free users see nothing. Pro ($2.99) sees total scan count only.
+  Pro+ ($9.99) sees full analytics.
+
+HOW TO CAPTURE SCAN DATA:
+───────────────────────────
+  When a user hits GET /r/:shortcode, BEFORE redirecting, log:
+
+  {
+    shortcode: "xK9mP2",
+    timestamp: new Date().toISOString(),
+    user_agent: req.headers['user-agent'],
+    ip_country: req.headers['cf-ipcountry'],  // Cloudflare adds this for free
+    referrer: req.headers['referer'] || 'direct'
+  }
+
+  Parse user_agent with the 'ua-parser-js' npm package:
+    - device.type → "mobile" / "tablet" / "desktop"
+    - browser.name → "Chrome" / "Safari" / "Firefox"
+    - os.name → "iOS" / "Android" / "Windows"
+
+  Store each scan as a row in a 'scans' database table.
+  The redirect still happens immediately — logging is non-blocking (async).
+
+ANALYTICS DASHBOARD UI:
+─────────────────────────
+  Located at: /dashboard/analytics/:shortcode
+
+  Layout: Full dark page, same aesthetic as main site
+
+  TOP ROW — 4 stat cards:
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │ Total Scans │ │ Today       │ │ This Week   │ │ Top Country │
+    │    1,284    │ │     42      │ │    318      │ │     IN 🇮🇳   │
+    └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+
+  MAIN CHART — Scans over time:
+    Line chart using recharts (already available in React ecosystem)
+    Time range selector: 7 days / 30 days / 90 days / All time
+    Purple line on dark background, area fill with purple gradient below
+
+  SECONDARY CHARTS (smaller, side by side):
+    Left: Donut chart — Device breakdown (Mobile / Desktop / Tablet)
+    Right: Bar chart — Top 5 countries
+
+  BOTTOM TABLE — Recent scans:
+    Timestamp | Device | Browser | Country
+    (No IP addresses shown — privacy-friendly)
+
+PRIVACY NOTE:
+  Do NOT store raw IP addresses — just the country code from Cloudflare.
+  Add a line to your Privacy Policy: "We collect anonymized scan data
+  including device type, browser, and country for analytics purposes.
+  No personally identifiable information is stored."
+
+CHART LIBRARY:
+  Use 'recharts' — works great with React, dark-theme friendly
+  npm install recharts
+
+ANALYTICS PAGE COPY:
+  Empty state (no scans yet):
+    Illustration: a small QR code with radar waves
+    "No scans yet. Share your QR code to start seeing data here."
+    CTA: "Copy QR link to share"
+
+================================================================================
+SECTION 3 — UPDATED PRICING TIERS
+================================================================================
+
+NEW 3-TIER STRUCTURE:
+
+TIER 1 — FREE ($0)
+  ✓ 3 QR code previews per session
+  ✓ Basic black & white
+  ✓ Low-res PNG (300px)
+  ✗ Custom colors
+  ✗ Logo upload
+  ✗ Dynamic QR codes
+  ✗ Scan analytics
+  CTA: "Start Free"
+
+TIER 2 — PRO ($2.99 one-time per download)
+  ✓ Full color customization
+  ✓ Logo in center
+  ✓ High-res PNG (2000px) + SVG
+  ✓ No watermark
+  ✓ All dot styles
+  ✓ 1 Dynamic QR code
+  ✓ Basic scan count (total only)
+  ✗ Full analytics dashboard
+  ✗ Unlimited dynamic QR codes
+  CTA: "Get Pro Download"
+
+TIER 3 — PRO+ ($9.99/month OR $49/year)
+  ✓ Everything in Pro
+  ✓ Unlimited dynamic QR codes
+  ✓ Full analytics dashboard
+     (scans over time, device, browser, country)
+  ✓ QR code dashboard (manage all codes)
+  ✓ Bulk generation (up to 50 at once)
+  ✓ Priority support
+  Badge: "Best Value" in gold
+  CTA: "Start Pro+"
+
+NOTE ON SWITCHING TO SUBSCRIPTION:
+  Pro+ being a subscription ($9.99/month) is a BIG deal.
+  Even 50 Pro+ subscribers = $500/month recurring.
+  This is the real business model long-term.
+  Use Stripe Subscriptions (not Payment Links) for this tier.
+
+================================================================================
+SECTION 4 — BACKEND REQUIREMENTS
+================================================================================
+
+You now need a minimal backend. Here's the simplest possible setup:
+
+OPTION A — SUPABASE (Recommended, free tier)
+─────────────────────────────────────────────
+  Supabase gives you: Postgres DB + Auth + REST API + Edge Functions
+  Free tier: 500MB DB, 2 edge functions, 50,000 monthly active users
+
+  Setup (30 minutes):
+  1. Create account at supabase.com
+  2. Create a new project
+  3. Create these tables:
+
+  TABLE: qr_codes
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid()
+    user_id     uuid REFERENCES auth.users(id)
+    name        text
+    shortcode   text UNIQUE
+    destination text
+    is_dynamic  boolean DEFAULT false
+    created_at  timestamptz DEFAULT now()
+    updated_at  timestamptz DEFAULT now()
+
+  TABLE: scans
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid()
+    shortcode   text REFERENCES qr_codes(shortcode)
+    scanned_at  timestamptz DEFAULT now()
+    device_type text  -- 'mobile', 'desktop', 'tablet'
+    browser     text
+    country     text
+    os          text
+
+  4. Create an Edge Function for the redirect:
+     File: supabase/functions/redirect/index.ts
+     Route: /r/:shortcode → lookup → 302 redirect + log scan
+
+  5. Install Supabase client in your project:
+     npm install @supabase/supabase-js
+
+  6. Auth: use Supabase's built-in email/password auth
+     supabase.auth.signUp({ email, password })
+     supabase.auth.signIn({ email, password })
+
+OPTION B — REPLIT + EXPRESS + MONGODB ATLAS (Stay on Replit)
+──────────────────────────────────────────────────────────────
+  If you want to stay on Replit:
+  1. Add an Express backend to your Replit project
+  2. Use MongoDB Atlas (free tier: 512MB) for the database
+  3. Use mongoose for DB models
+  4. Add these routes:
+     POST /api/qr/create-dynamic  → creates shortcode + saves to DB
+     GET  /r/:shortcode           → redirect + log scan
+     GET  /api/analytics/:shortcode → return scan data
+     PATCH /api/qr/:shortcode     → update destination URL
+  5. Use JWT for auth (jsonwebtoken npm package)
+
+================================================================================
+SECTION 5 — ABOUT PAGE
+================================================================================
+
+PAGE ROUTE: /about
+TITLE: "About QRcraft"
+
+────────────────────────────────────────
+LAYOUT SPECIFICATION
+────────────────────────────────────────
+
+SECTION 1 — HERO (above the fold)
+  Background: same radial gradient as homepage
+  Layout: centered, narrow column (max-width 720px)
+
+  Small badge at top:
+    "Built by a student. Used by businesses."
+    Pill style, purple border, same as homepage badge
+
+  Headline (Syne 800):
+    "The story behind
+    QRcraft"
+    "QRcraft" in gradient-text class
+
+  Sub-paragraph (DM Sans 400, --text-secondary):
+    "QRcraft started as a weekend project and turned into something
+     people actually use. Here's the honest story."
+
+SECTION 2 — FOUNDER CARD
+  A premium dark card (full-width, max-width 720px, centered)
+  Border: 1px solid rgba(124,110,250,0.2)
+  Box-shadow: purple glow
+  Padding: 40px 48px
+
+  LEFT: Avatar area
+    A stylized placeholder avatar (initials "AG" in a gradient circle)
+    OR: link to a photo if Arnav adds one later
+    Size: 80x80px circle
+
+  RIGHT: Bio content
+    Name: "Arnav Garg" — Syne 700, 24px, white
+    Title: "Front-End Developer & Student" — DM Sans 500, --text-muted, 14px
+    Location pill: "📍 New Delhi, India" — small badge
+
+    Bio paragraph (DM Sans 400, 15px, --text-secondary, line-height 1.7):
+    "I'm a first-year student at BITS Pilani studying computer science,
+     currently deep in the world of React, Tailwind, and modern web
+     development. I build things to learn — and QRcraft is one of those
+     things that ended up being genuinely useful.
+
+     I noticed that every QR code tool was either ugly and free, or
+     beautiful and expensive. There was nothing in between for a small
+     business owner who just wants something that looks good without a
+     monthly subscription. So I built it."
+
+  Social links row (below bio):
+    Three icon+text links in a row:
+    🔗 LinkedIn     → https://www.linkedin.com/in/arnavrg/
+    💻 GitHub       → https://github.com/gargarnav
+    🌐 Portfolio    → https://arnavgarg-zeta.vercel.app
+
+    Each link: small dark pill with icon, --text-muted text
+    Hover: border-color purple, text white
+
+SECTION 3 — THE MISSION
+  Centered, max-width 640px
+
+  Section label (uppercase, spaced, --text-muted):
+    "MISSION"
+
+  Headline (Syne 700, 32px):
+    "Design shouldn't be a luxury"
+
+  Body paragraphs (DM Sans 400, --text-secondary):
+    "Most QR code tools make you choose: pay $50/month for a professional
+     platform, or use a free tool that makes your brand look amateur.
+     That's a false choice.
+
+     QRcraft exists to give small businesses, event organizers, freelancers,
+     and creators access to professional-quality QR codes without the
+     enterprise price tag. Beautiful design should be accessible to everyone —
+     not just companies with a design budget."
+
+SECTION 4 — WHAT'S BEEN BUILT (mini timeline)
+  Left-aligned timeline, max-width 640px centered
+
+  Section label: "BUILDING IN PUBLIC"
+
+  Timeline items (3 milestones):
+
+  ◆ February 2026 — QRcraft Launched
+    "Built the MVP in a weekend using React, Vite, and qr-code-styling.
+     Launched on qrcraft.fun. First paying customer within 48 hours."
+
+  ◆ Coming Soon — Dynamic QR Codes
+    "Scan tracking + the ability to update your QR code's destination
+     after printing. No more reprints."
+
+  ◆ Coming Soon — Full Analytics
+    "See where your scans are coming from — by country, device, and time.
+     Built for businesses that care about reach."
+
+  Timeline visual:
+    Vertical line on the left (2px, purple gradient, fades out at bottom)
+    Each item has a small purple diamond (◆) on the line
+    Items stagger in on scroll (IntersectionObserver)
+
+SECTION 5 — TECH STACK USED
+  "Built with these tools" section label
+
+  Icon grid (same style as Arnav's personal site):
+    React | Vite | Tailwind CSS | qr-code-styling | Stripe | Vercel
+    Each: small icon + name, dark card, hover lift
+
+SECTION 6 — CTA AT BOTTOM
+  Dark card, full width, centered content
+  Purple glow border
+
+  Headline: "Have a question or feedback?"
+  Body: "I read every message. Whether it's a bug, a feature idea,
+         or just saying hi — reach out."
+
+  Two buttons:
+    Primary: "View my other projects" → links to https://arnavgarg-zeta.vercel.app
+    Secondary: "Follow on LinkedIn" → links to https://www.linkedin.com/in/arnavrg/
+
+================================================================================
+SECTION 6 — CURSOR PROMPT
+================================================================================
+
+Copy everything below the dashes and paste into Cursor:
+
+──────────────────────────────────────────────────────────────────────────────
+
+I need you to add three major things to the existing QRcraft codebase.
+Read all instructions carefully before writing any code.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 1 — DYNAMIC QR CODES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Add a "Dynamic QR Code" toggle to the Controls panel (src/components/Controls.jsx).
+
+When the user enables Dynamic mode:
+1. Show a text input: "QR Code Name" (e.g. "Restaurant Menu") — for their reference
+2. Show the destination URL input as normal
+3. When they click "Generate Dynamic QR", do this:
+   a. Generate a 6-character random shortcode using:
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      const shortcode = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+   b. The QR code's CONTENT should encode: https://qrcraft.fun/r/${shortcode}
+      NOT the original destination URL
+   c. Store the mapping in a dynamicCodes array in React state:
+      { shortcode, destination, name, createdAt: new Date().toISOString() }
+   d. Show a success message: "Dynamic QR created! Short URL: qrcraft.fun/r/${shortcode}"
+
+NOTE: For the MVP, this is simulated client-side only.
+The actual redirect won't work until a backend is added.
+Add a comment in the code: // TODO: Save to database via POST /api/qr/create-dynamic
+
+Add a new page/component: src/components/Dashboard.jsx
+Route: accessible via a "Dashboard" link in the header (only show if user has any dynamic codes)
+
+Dashboard shows a table of all dynamic QR codes in state:
+Columns: Name | Short URL | Destination | Created | Actions (Edit / Delete)
+
+"Edit" opens an inline edit row where they can type a new destination URL.
+Clicking save updates the destination in state and shows:
+"Updated! Note: redirect won't change until backend is connected."
+
+"Delete" removes from state with a confirmation.
+
+Each row shows a tiny 80x80px QR code thumbnail (use qr-code-styling with size 80).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 2 — SCAN ANALYTICS (UI ONLY — PAID FEATURE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create a new component: src/components/Analytics.jsx
+
+This page is only accessible when hasPaid=true.
+If hasPaid=false, show the PaywallModal immediately.
+
+The analytics page shows SIMULATED data (since we have no real backend yet).
+Generate realistic fake scan data for demo purposes:
+
+const generateMockScans = (days = 30) => {
+  return Array.from({ length: days }, (_, i) => ({
+    date: new Date(Date.now() - (days - i) * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    scans: Math.floor(Math.random() * 80) + 10
+  }))
+}
+
+const mockDevices = [
+  { name: 'Mobile', value: 68, color: '#7C6EFA' },
+  { name: 'Desktop', value: 24, color: '#FF6B8A' },
+  { name: 'Tablet', value: 8, color: '#4ADE80' }
+]
+
+const mockCountries = [
+  { country: '🇮🇳 India', scans: 421 },
+  { country: '🇺🇸 United States', scans: 238 },
+  { country: '🇬🇧 United Kingdom', scans: 94 },
+  { country: '🇦🇺 Australia', scans: 67 },
+  { country: '🇨🇦 Canada', scans: 52 }
+]
+
+Install recharts: npm install recharts
+
+Layout of Analytics page:
+
+TOP — 4 stat cards in a row:
+  Total Scans: sum of all mock data
+  Today: last item in mock data array
+  This Week: sum of last 7 items
+  Top Device: "Mobile 68%"
+
+MAIN CHART — Line chart using recharts LineChart:
+  X-axis: dates
+  Y-axis: scan count
+  Line color: #7C6EFA
+  Area fill: purple gradient (use recharts AreaChart with gradient fill)
+  Dark background, grid lines in rgba(255,255,255,0.05)
+  Time range buttons above: "7D" "30D" "90D" — filter the data shown
+
+SECONDARY ROW (2 charts side by side):
+  Left: PieChart for device breakdown (Mobile/Desktop/Tablet)
+         Colors: purple, pink, green
+  Right: Simple bar list for top countries
+         Each bar: country flag + name + scan count + colored bar
+
+Add a banner at the top of Analytics:
+  "⚠️ This is a demo preview. Real analytics will be available once
+   dynamic QR codes are connected to a live backend."
+  Background: rgba(251,191,36,0.08), border: 1px solid rgba(251,191,36,0.2)
+
+Add an "Analytics" button to each row in the Dashboard table.
+Clicking it navigates to the Analytics page for that QR code.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 3 — ABOUT PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create a new component: src/components/About.jsx
+Add route /about to App.jsx (use React Router or conditional rendering based on a page state).
+Add "About" link to the Header nav.
+
+Build the About page with these exact sections:
+
+SECTION 1 — HERO:
+  Badge: "Built by a student. Used by businesses."
+  H1: "The story behind" (white) + "QRcraft" (gradient-text)
+  Subtext: "QRcraft started as a weekend project and turned into something people actually use. Here's the honest story."
+
+SECTION 2 — FOUNDER CARD (dark card, purple glow border):
+  Avatar: A circle with gradient background (purple to pink) containing white initials "AG"
+    Size: 80x80px
+    Font: Syne 700, 28px
+
+  Name: "Arnav Garg"
+  Title: "Front-End Developer & Student"
+  Location: "📍 New Delhi, India" as a small dark pill
+
+  Bio (exact text):
+  "I'm a first-year student at BITS Pilani, currently deep in the world
+  of React, Tailwind, and modern web development. I build things to learn —
+  and QRcraft is one of those things that ended up being genuinely useful.
+
+  I noticed that every QR code tool was either ugly and free, or beautiful
+  and expensive. There was nothing in between for a small business owner who
+  just wants something that looks good without a monthly subscription.
+  So I built it."
+
+  Social links row:
+    LinkedIn icon + "LinkedIn" → https://www.linkedin.com/in/arnavrg/
+    GitHub icon + "GitHub" → https://github.com/gargarnav
+    Globe icon + "Portfolio" → https://arnavgarg-zeta.vercel.app
+    
+    Use these SVG icons inline (no icon library needed):
+    LinkedIn: a rounded square with "in"
+    GitHub: the octocat outline path
+    Globe: a circle with meridian lines
+    Style: small dark pill (bg-card, border border-border, px-3 py-1.5, rounded-full)
+    Hover: border-primary, text white
+
+SECTION 3 — MISSION:
+  Label: "MISSION" (uppercase, spaced, muted)
+  H2: "Design shouldn't be a luxury"
+  Body (exact text):
+  "Most QR code tools make you choose: pay $50/month for a professional
+  platform, or use a free tool that makes your brand look amateur.
+  That's a false choice.
+
+  QRcraft exists to give small businesses, event organizers, freelancers,
+  and creators access to professional-quality QR codes without the
+  enterprise price tag. Beautiful design should be accessible to everyone —
+  not just companies with a design budget."
+
+SECTION 4 — BUILDING IN PUBLIC (timeline):
+  Label: "BUILDING IN PUBLIC"
+  Three items with a vertical purple line on the left:
+
+  Item 1 (completed — solid purple dot):
+    Date: "February 2026"
+    Title: "QRcraft Launched"
+    Body: "Built the MVP in a weekend using React, Vite, and qr-code-styling.
+           Launched on qrcraft.fun."
+
+  Item 2 (coming soon — outlined dot):
+    Date: "Coming Soon"
+    Title: "Dynamic QR Codes"
+    Body: "Update your QR code's destination after printing. No more reprints."
+
+  Item 3 (coming soon — outlined dot):
+    Date: "Coming Soon"
+    Title: "Full Scan Analytics"
+    Body: "See where your scans come from — by country, device, and time."
+
+SECTION 5 — TECH STACK:
+  Label: "BUILT WITH"
+  6 small dark cards in a row (flex wrap):
+    React | Vite | Tailwind CSS | qr-code-styling | Stripe | Vercel
+    Each: 100px wide, centered icon placeholder (colored circle) + name
+    Hover: border-primary, translateY(-2px)
+
+SECTION 6 — CTA:
+  Dark card, full-width, centered
+  Purple glow border
+  H3: "Have feedback or questions?"
+  Body: "I read every message. Whether it's a bug, a feature idea,
+         or just saying hi — reach out."
+  Two buttons:
+    Primary: "View my work" → opens https://arnavgarg-zeta.vercel.app in new tab
+    Secondary (outlined): "Connect on LinkedIn" → opens https://www.linkedin.com/in/arnavrg/ in new tab
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERAL RULES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. All new pages must match the existing dark aesthetic exactly
+   (bg-dark, same fonts, same purple glow cards, same button styles)
+2. Add navigation between pages using conditional rendering in App.jsx
+   (a simple `currentPage` state: 'home' | 'dashboard' | 'analytics' | 'about')
+3. Update the Header to include links: Home | Dashboard | About
+4. All new components go in src/components/
+5. Install recharts before writing the Analytics component: npm install recharts
+6. Do not break any existing functionality
+7. Write every file in full — do not summarize or skip sections
+8. After writing all files, run npm run dev and confirm zero errors
+
+──────────────────────────────────────────────────────────────────────────────
+END OF CURSOR PROMPT
+================================================================================
+END OF DOCUMENT
+================================================================================
