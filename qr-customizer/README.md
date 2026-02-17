@@ -1,4 +1,4 @@
-# QRcraft
+# qrcraft.fun
 
 A beautiful, client-side QR code generator built with React, Vite, and Tailwind CSS.
 Create branded QR codes with custom colors, dot styles, and logos.
@@ -65,9 +65,8 @@ To enable payments:
 1. Create a Payment Link in your Stripe Dashboard.
 2. Open `src/components/Pricing.jsx` and `src/components/PaywallModal.jsx`.
 3. Replace `STRIPE_PAYMENT_LINK` constant with your actual link.
-4. Configure your Stripe Payment Link to redirect to `https://your-domain.com/?paid=true` after payment.
+4. Configure your Stripe Payment Link to redirect to `https://qrcraft.fun/?paid=true` after payment.
 
 ## License
 
 MIT
-# QRCraft

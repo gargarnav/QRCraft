@@ -19,7 +19,7 @@ export default function Footer() {
                                     <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v3h-3v-3zm-3 3h2v-2h-2v2zm-3-3h2v2h-2v-2z" />
                                 </svg>
                             </div>
-                            <span className="font-syne font-bold text-xl text-white">QRcraft</span>
+                            <span className="font-syne font-bold text-xl text-white">qrcraft.fun</span>
                         </div>
                         <p className="text-textSecondary text-sm max-w-xs leading-relaxed">
                             Beautiful QR codes for everyone. Designed to elevate your brand presence with premium aesthetics.
@@ -48,7 +48,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-textMuted">
-                    <p>&copy; 2026 QRcraft. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} qrcraft.fun. All rights reserved.</p>
                     <div className="flex gap-6 mt-4 md:mt-0">
                         <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
                         <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

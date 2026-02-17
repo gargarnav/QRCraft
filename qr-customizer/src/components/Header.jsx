@@ -22,7 +22,7 @@ export default function Header() {
                                 <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v3h-3v-3zm-3 3h2v-2h-2v2zm-3-3h2v2h-2v-2z" />
                             </svg>
                         </div>
-                        <span className="font-syne font-bold text-xl tracking-tight text-white group-hover:text-white/90 transition-colors">QRcraft</span>
+                        <span className="font-syne font-bold text-xl tracking-tight text-white group-hover:text-white/90 transition-colors">qrcraft.fun</span>
                     </div>
 
                     {/* Desktop Nav */}
