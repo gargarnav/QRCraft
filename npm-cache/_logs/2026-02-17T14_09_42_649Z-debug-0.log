@@ -1,0 +1,27 @@
+0 verbose cli /opt/homebrew/Cellar/node/25.4.0/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.7.0
+2 info using node@v25.4.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/arnavgarg/Desktop/Projects/QR/qr-customizer/.npmrc
+5 silly config load:file:/Users/arnavgarg/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm exec tailwindcss init -p
+8 verbose argv "exec" "--cache" "../npm-cache" "--" "tailwindcss" "init" "-p"
+9 verbose logfile logs-max:10 dir:/Users/arnavgarg/Desktop/Projects/QR/npm-cache/_logs/2026-02-17T14_09_42_649Z-
+10 verbose logfile /Users/arnavgarg/Desktop/Projects/QR/npm-cache/_logs/2026-02-17T14_09_42_649Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 verbose stack Error: could not determine executable to run
+13 verbose stack     at getBinFromManifest (/opt/homebrew/lib/node_modules/npm/node_modules/libnpmexec/lib/get-bin-from-manifest.js:17:23)
+13 verbose stack     at exec (/opt/homebrew/lib/node_modules/npm/node_modules/libnpmexec/lib/index.js:206:15)
+13 verbose stack     at async Npm.exec (/opt/homebrew/lib/node_modules/npm/lib/npm.js:208:9)
+13 verbose stack     at async module.exports (/opt/homebrew/lib/node_modules/npm/lib/cli/entry.js:67:5)
+14 verbose pkgid tailwindcss@4.1.18
+15 error could not determine executable to run
+16 verbose cwd /Users/arnavgarg/Desktop/Projects/QR/qr-customizer
+17 verbose os Darwin 25.0.0
+18 verbose node v25.4.0
+19 verbose npm  v11.7.0
+20 verbose exit 1
+21 verbose code 1
+22 error A complete log of this run can be found in: /Users/arnavgarg/Desktop/Projects/QR/npm-cache/_logs/2026-02-17T14_09_42_649Z-debug-0.log

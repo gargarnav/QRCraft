@@ -1,0 +1,747 @@
+================================================================================
+         QR CODE CUSTOMIZER — COMPLETE PROJECT BLUEPRINT
+         A Micro-SaaS Idea for Fast, Simple Income
+================================================================================
+
+Last Updated: February 2026
+Document Type: Full Project Blueprint
+Estimated Build Time: 1–3 days (MVP), 1–2 weeks (full version)
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+  1. THE IDEA — Overview & Vision
+  2. PROBLEM & SOLUTION
+  3. TARGET AUDIENCE
+  4. MONETIZATION STRATEGY
+  5. TECH STACK — Full Breakdown
+  6. SITE DESIGN — Layout, Colors, UI/UX
+  7. PAGE-BY-PAGE CONTENT
+  8. FEATURE LIST — MVP vs Full Version
+  9. LAUNCH STRATEGY
+  10. GROWTH & SCALING
+  11. TOOLS & RESOURCES
+
+================================================================================
+SECTION 1 — THE IDEA: OVERVIEW & VISION
+================================================================================
+
+NAME IDEAS:
+  - QRcraft
+  - QRbrush
+  - StyleQR
+  - QRforge
+  - dotQR
+
+ONE-LINER PITCH:
+  "Create beautiful, branded QR codes in seconds — no design skills needed."
+
+WHAT IT IS:
+  A lightweight web app that lets anyone generate fully customized QR codes.
+  Unlike free tools that produce plain black-and-white squares, this tool
+  allows users to style every aspect of their QR code — colors, shapes,
+  logo placement, gradients, dot patterns — and download a high-quality file
+  ready to print or share digitally.
+
+WHY IT'S A GOOD IDEA:
+  - QR codes are now everywhere (menus, events, business cards, packaging)
+  - Most free tools are ugly and basic
+  - Businesses will pay a small fee for something that looks professional
+  - Very low competition at the small/micro scale
+  - No backend required for MVP — runs entirely in the browser
+  - Stripe integration takes 30 minutes to set up
+  - Repeat traffic is easy with shareability ("look at this cool QR code I made")
+
+VISION:
+  Start as a simple tool. Grow into the go-to platform for branded QR codes
+  for small businesses, event planners, and content creators.
+
+================================================================================
+SECTION 2 — PROBLEM & SOLUTION
+================================================================================
+
+THE PROBLEM:
+  Businesses need QR codes constantly — for menus, product packaging, event
+  check-ins, business cards, social media, and more. But:
+
+    - Free tools (QR Code Generator, QRStuff) produce generic, ugly codes
+    - Design tools (Canva, Figma) require too many steps and skill
+    - Professional tools (Beaconstac, QR Tiger) are expensive ($15–$50/month)
+    - Most people don't want a subscription — they just want ONE good QR code
+
+THE SOLUTION:
+  A dead-simple web app that:
+    1. Takes a URL (or text, email, phone number, WiFi credentials, etc.)
+    2. Lets you style it with easy visual controls
+    3. Shows a live preview that updates instantly
+    4. Lets you download in high resolution (PNG, SVG) after a small payment
+
+THE GAP THIS FILLS:
+  Between "free and ugly" and "expensive and complex" — a simple, beautiful,
+  one-time-pay tool for people who care about design but don't want a subscription.
+
+================================================================================
+SECTION 3 — TARGET AUDIENCE
+================================================================================
+
+PRIMARY USERS:
+
+  1. SMALL BUSINESS OWNERS
+     - Restaurants putting QR codes on tables for menus
+     - Shops adding QR codes to product packaging
+     - Service providers linking to their booking page
+     - Pain: They want it to look professional, not generic
+
+  2. EVENT ORGANIZERS & WEDDING PLANNERS
+     - Wedding QR codes (link to RSVP, registry, photo album)
+     - Event check-in codes, festival maps, speaker bios
+     - Pain: They want something that matches their event's aesthetic
+
+  3. FREELANCERS & AGENCIES
+     - Add QR codes to client deliverables, proposals, business cards
+     - Pain: Need something fast and polished without firing up Figma
+
+  4. CONTENT CREATORS & INFLUENCERS
+     - QR codes linking to their link-in-bio, YouTube, Spotify
+     - Pain: They want it to match their brand colors
+
+  5. REAL ESTATE AGENTS
+     - QR codes on flyers linking to property listings
+     - Pain: Needs to look clean and branded
+
+SECONDARY USERS:
+  - Students making posters for school projects
+  - Teachers sharing links with classes
+  - Nonprofits creating flyers for campaigns
+  - Developers prototyping apps
+
+USER PERSONA — PRIMARY:
+  Name: Priya, 34
+  Job: Owns a small clothing boutique
+  Need: A QR code for her Instagram on store bags — matching her brand colors
+  Tech level: Comfortable with Canva, not a developer
+  Willingness to pay: Yes, $3–8 for something that looks great
+  Decision speed: Buys in under 5 minutes if the tool is easy and preview looks good
+
+================================================================================
+SECTION 4 — MONETIZATION STRATEGY
+================================================================================
+
+RECOMMENDED MODEL: FREEMIUM + PAY-PER-DOWNLOAD
+
+  FREE TIER:
+    - Generate up to 3 QR codes
+    - Basic black & white only
+    - Small watermark on download
+    - Low-res PNG (300x300px)
+    - Unlimited previews
+
+  PAID TIER — "Pro Download" ($2.99 per download):
+    - Full color customization
+    - Logo/image in the center
+    - High-res PNG (2000x2000px)
+    - SVG vector format (infinitely scalable)
+    - No watermark
+    - Multiple dot styles
+
+  BUNDLE — "Pack of 5" ($9.99):
+    - 5 high-res downloads
+    - Best for freelancers or agencies making codes for multiple clients
+
+  LIFETIME — "Unlimited" ($19.99 one-time):
+    - Unlimited downloads forever
+    - Great for ProductHunt launch or AppSumo deal
+    - Best for word-of-mouth: "I paid once and use it all the time"
+
+PAYMENT PROCESSOR:
+  Use Stripe Checkout — easiest integration, handles taxes, card processing
+  Alternative: Lemon Squeezy (built-in EU VAT handling, great for solo devs)
+
+REVENUE PROJECTIONS (Conservative):
+  - 10 sales/day at $2.99 average = ~$900/month
+  - 5 bundle sales/day at $9.99 = ~$1,500/month
+  - Combined realistic target: $500–$2,000/month after 2–3 months
+
+ADS (Optional Later):
+  - Google AdSense on the free tier
+  - Place a small banner below the preview
+  - Can earn $50–$200/month passively once traffic grows
+
+================================================================================
+SECTION 5 — TECH STACK: FULL BREAKDOWN
+================================================================================
+
+PHILOSOPHY:
+  Keep it as simple as possible. No database needed for MVP.
+  Everything runs in the browser. Payment is handled by Stripe.
+
+------------------------------------------------------------
+FRONTEND
+------------------------------------------------------------
+
+FRAMEWORK:
+  React (with Vite for fast setup)
+  OR plain HTML + Vanilla JS (even simpler, no build step)
+
+  Recommendation for speed: Use React with Vite
+    - npx create-vite@latest qr-customizer --template react
+    - Add Tailwind CSS for styling (fast, no custom CSS needed)
+
+QR CODE LIBRARY:
+  qr-code-styling (npm package)
+    - Supports: dot shapes, colors, gradients, embedded images
+    - Live preview: Yes
+    - Output formats: PNG, SVG, JPEG, WEBP
+    - GitHub: niclas-timm/qr-code-styling
+    - Install: npm install qr-code-styling
+
+  ALTERNATIVE: qrcode.react
+    - Simpler, less styling options
+    - Good for MVP if qr-code-styling feels complex
+
+COLOR PICKER:
+  react-color (npm package)
+    - Multiple picker styles: sketch, chrome, swatches
+    - Install: npm install react-color
+
+FILE DOWNLOAD:
+  Native browser API — no library needed
+    - For PNG: canvas.toBlob() + URL.createObjectURL()
+    - For SVG: serialize the SVG element + Blob download
+
+LOGO UPLOAD:
+  Native HTML file input
+    - <input type="file" accept="image/*" />
+    - FileReader API to convert to base64 and pass to qr-code-styling
+
+------------------------------------------------------------
+PAYMENTS
+------------------------------------------------------------
+
+STRIPE CHECKOUT (Recommended):
+  - Create a Stripe account (free)
+  - Set up a "Payment Link" in the Stripe dashboard (no-code option)
+  - OR use Stripe.js for custom integration
+  - After successful payment, redirect to download page
+
+  Flow:
+    User clicks "Download" → Stripe Checkout opens → Payment succeeds →
+    Redirect to /success?session_id=xyz → Verify on frontend → Enable download
+
+  No backend needed for simple version:
+    Use Stripe Payment Links (generates a hosted page — zero code)
+    After payment, Stripe redirects to your success URL with a token
+    Store a "paid" flag in localStorage after redirect
+
+ALTERNATIVE — LEMON SQUEEZY:
+  - Similar to Stripe but auto-handles EU VAT
+  - Great for solo devs who don't want tax headaches
+  - Has a simple JS embed
+
+------------------------------------------------------------
+HOSTING
+------------------------------------------------------------
+
+  Vercel (Recommended — free tier is perfect):
+    - Connect GitHub repo → Auto-deploys on push
+    - Custom domain support (buy a $10/year domain on Namecheap)
+    - CDN included for fast global loading
+
+  Alternatives:
+    - Netlify (also free, similar to Vercel)
+    - Cloudflare Pages (free, very fast)
+
+------------------------------------------------------------
+DOMAIN & BRANDING
+------------------------------------------------------------
+
+  Buy a domain: Namecheap or Porkbun (~$10/year)
+  SSL: Included free with Vercel/Netlify
+  Email: Zoho Mail free tier for a professional contact email
+
+------------------------------------------------------------
+ANALYTICS
+------------------------------------------------------------
+
+  Plausible Analytics (privacy-first, lightweight):
+    - Free self-hosted OR $9/month hosted
+    - Shows visitors, top pages, conversion funnel
+
+  Alternative: Google Analytics (free, more detailed)
+
+------------------------------------------------------------
+FULL TECH STACK SUMMARY
+------------------------------------------------------------
+
+  Layer             | Technology
+  ──────────────────|─────────────────────────────
+  Framework         | React + Vite
+  Styling           | Tailwind CSS
+  QR Generation     | qr-code-styling
+  Color Picker      | react-color
+  Payments          | Stripe Checkout / Lemon Squeezy
+  Hosting           | Vercel
+  Domain            | Namecheap / Porkbun
+  Analytics         | Plausible / Google Analytics
+  Email             | Zoho Mail (free)
+  Version Control   | GitHub
+
+================================================================================
+SECTION 6 — SITE DESIGN: LAYOUT, COLORS, UI/UX
+================================================================================
+
+------------------------------------------------------------
+DESIGN PHILOSOPHY
+------------------------------------------------------------
+
+  - Clean, minimal, modern
+  - Tool-first: the QR customizer is front and center
+  - Fast to understand: user should know exactly what to do in 3 seconds
+  - Light and dark mode support (optional, adds perceived quality)
+  - Mobile-friendly (many users will visit on phone)
+
+------------------------------------------------------------
+COLOR PALETTE (Recommended)
+------------------------------------------------------------
+
+  Background:   #0F0F0F or #F9F9F9 (dark or light mode)
+  Primary:      #6C63FF (vibrant purple — feels modern/techy)
+  Accent:       #FF6584 (pink — for CTAs and highlights)
+  Text:         #1A1A2E (dark navy for readability)
+  Card/Panel:   #FFFFFF with subtle shadow
+  Success:      #4CAF50 (green for confirmations)
+  Border:       #E5E7EB (light gray)
+
+  ALTERNATIVE PALETTE (more business-friendly):
+  Primary:      #2563EB (blue)
+  Accent:       #10B981 (emerald green)
+  Background:   #F8FAFC
+
+------------------------------------------------------------
+TYPOGRAPHY
+------------------------------------------------------------
+
+  Headings:   "Inter" or "Plus Jakarta Sans" (Google Fonts — free)
+  Body:       "Inter" (same family, feels cohesive)
+  Monospace:  "JetBrains Mono" (for URL input field — looks intentional)
+
+  Font sizes:
+    H1: 48px / 3rem (hero headline)
+    H2: 32px / 2rem (section titles)
+    Body: 16px / 1rem
+    Small: 14px / 0.875rem (labels, captions)
+
+------------------------------------------------------------
+LAYOUT — PAGE STRUCTURE
+------------------------------------------------------------
+
+  HEADER (sticky, minimal):
+    [Logo + Name]  ............  [Pricing] [Blog] [Login (future)]
+
+  HERO SECTION:
+    Left: Headline + subheadline + CTA button
+    Right: Animated demo or screenshot of a beautiful QR code
+
+  TOOL SECTION (main area — takes up most of the page):
+    ┌─────────────────────────────────────────────┐
+    │  LEFT PANEL (controls)   │  RIGHT PANEL      │
+    │                          │  (live preview)   │
+    │  [URL Input]             │                   │
+    │  [QR Type dropdown]      │   ████████████    │
+    │  [Color pickers]         │   ██  ████  ██    │
+    │  [Background color]      │   ██  ████  ██    │
+    │  [Dot style selector]    │   ████  ██████    │
+    │  [Logo upload]           │   ██████  ████    │
+    │  [Corner style]          │                   │
+    │  [Error correction]      │  [Download PNG]   │
+    │                          │  [Download SVG]   │
+    └─────────────────────────────────────────────┘
+
+  SOCIAL PROOF SECTION:
+    "Trusted by 1,000+ businesses" + logos or testimonials
+
+  USE CASES SECTION:
+    Cards for: Restaurants / Events / Business Cards / Creators
+
+  PRICING SECTION:
+    3 tiers: Free / Single Download / Bundle
+
+  FAQ SECTION:
+    5–7 common questions
+
+  FOOTER:
+    Links + copyright + social
+
+------------------------------------------------------------
+UI/UX DETAILS
+------------------------------------------------------------
+
+  LIVE PREVIEW:
+    - QR code updates in real-time as user changes settings
+    - No "Generate" button needed — it just updates instantly
+    - Preview shows at 400x400px on desktop, 280x280px on mobile
+
+  CONTROLS DESIGN:
+    - Each control is a clearly labeled card/row
+    - Color pickers show a color swatch the user clicks
+    - Dot styles shown as small visual thumbnails (not just text)
+    - Logo upload area is a drag-and-drop zone with dashed border
+
+  PAYWALL UX:
+    - Download button is visible but shows a lock icon for free users
+    - Clicking shows a clean modal: "Unlock high-res download for $2.99"
+    - After payment, button unlocks immediately
+
+  MOBILE DESIGN:
+    - Controls stack above the preview on mobile
+    - Preview is smaller but fully functional
+    - Download button is large, thumb-friendly
+
+  MICRO-INTERACTIONS:
+    - Button hover: slight scale up (transform: scale(1.02))
+    - Color picker: smooth fade-in
+    - Download success: brief confetti animation
+
+================================================================================
+SECTION 7 — PAGE-BY-PAGE CONTENT
+================================================================================
+
+------------------------------------------------------------
+HOMEPAGE — HERO SECTION
+------------------------------------------------------------
+
+  HEADLINE:
+    "QR Codes That Actually Look Good"
+
+  SUBHEADLINE:
+    "Stop sending customers ugly black squares. Design a branded QR code
+     in seconds — no design skills needed."
+
+  CTA BUTTON:
+    "Create My QR Code — It's Free"
+
+  SUPPORTING LINE BELOW CTA:
+    "✓ No account required  ✓ Instant preview  ✓ Download in seconds"
+
+------------------------------------------------------------
+HOMEPAGE — HOW IT WORKS
+------------------------------------------------------------
+
+  SECTION TITLE: "Three steps to a beautiful QR code"
+
+  STEP 1: Paste Your Link
+    "Enter any URL, text, phone number, or WiFi password."
+
+  STEP 2: Customize the Style
+    "Pick your colors, upload your logo, choose your dot shape —
+     watch it update live."
+
+  STEP 3: Download & Use
+    "Get a high-resolution PNG or SVG file, ready for print or digital use."
+
+------------------------------------------------------------
+HOMEPAGE — USE CASES
+------------------------------------------------------------
+
+  SECTION TITLE: "Perfect for any situation"
+
+  Card 1 — RESTAURANTS & CAFÉS
+    Icon: 🍽️
+    Title: "Digital menus in seconds"
+    Body: "Replace printed menus with a branded QR code that matches your
+           restaurant's style. Update the menu anytime without reprinting."
+
+  Card 2 — EVENTS & WEDDINGS
+    Icon: 🎉
+    Title: "Make every detail beautiful"
+    Body: "Create a QR code that fits your event aesthetic — use your wedding
+           colors, or match your brand at your next conference."
+
+  Card 3 — BUSINESS CARDS
+    Icon: 💼
+    Title: "Stand out at networking events"
+    Body: "Add a custom QR code to your business card linking to your portfolio,
+           LinkedIn, or booking page. Looks professional, works instantly."
+
+  Card 4 — CONTENT CREATORS
+    Icon: 📱
+    Title: "Turn followers into visitors"
+    Body: "Create a QR code in your brand colors linking to your link-in-bio,
+           YouTube channel, or Spotify profile. Share in videos, merch, or posts."
+
+------------------------------------------------------------
+HOMEPAGE — SOCIAL PROOF
+------------------------------------------------------------
+
+  SECTION TITLE: "Used by creators and businesses worldwide"
+
+  STATS ROW:
+    "10,000+ QR codes created"
+    "2,000+ happy customers"
+    "4.9/5 average rating"
+
+  TESTIMONIALS:
+    — "I needed a QR code for my restaurant menu that matched my brand.
+       This took me 3 minutes and looked amazing."
+       — Ananya S., Restaurant Owner
+
+    — "Finally a QR tool that doesn't make ugly codes. Worth every penny."
+       — Marco L., Freelance Designer
+
+    — "Used this for my wedding invitations. Our guests kept commenting
+       on how pretty the QR code was."
+       — Diya R., Bride
+
+------------------------------------------------------------
+PRICING PAGE CONTENT
+------------------------------------------------------------
+
+  HEADLINE: "Simple, honest pricing"
+  SUBHEADLINE: "Start for free. Pay only when you're ready to download."
+
+  TIER 1 — FREE
+    Price: $0
+    Features:
+      ✓ 3 QR code previews
+      ✓ Basic black & white style
+      ✓ Low-resolution PNG (300px)
+      ✗ Custom colors
+      ✗ Logo upload
+      ✗ High-res download
+    CTA: "Start for Free"
+
+  TIER 2 — SINGLE DOWNLOAD
+    Price: $2.99
+    Badge: "Most Popular"
+    Features:
+      ✓ Full color customization
+      ✓ Logo/image in center
+      ✓ High-res PNG (2000px)
+      ✓ SVG vector format
+      ✓ No watermark
+      ✓ 5 dot style options
+      ✓ Instant download
+    CTA: "Get This Download"
+
+  TIER 3 — 5-PACK
+    Price: $9.99
+    Features:
+      ✓ Everything in Single Download
+      ✓ 5 separate high-res downloads
+      ✓ Save downloads for later
+      ✓ Great for agencies & freelancers
+    CTA: "Buy 5-Pack"
+
+  NOTE BELOW PRICING:
+    "🔒 Secure payment via Stripe. No subscription, no hidden fees."
+
+------------------------------------------------------------
+FAQ SECTION CONTENT
+------------------------------------------------------------
+
+  Q: Are the QR codes I create actually scannable?
+  A: Yes, 100%. All codes are tested to be scannable by any standard camera
+     or QR reader app, even with heavy customization. We use proper error
+     correction to ensure reliability.
+
+  Q: What formats can I download?
+  A: Free users get a low-res PNG. Paid users get high-res PNG (2000x2000px)
+     and SVG (infinitely scalable for large print).
+
+  Q: Can I use the QR code commercially?
+  A: Yes. Once you download it, it's yours to use however you like —
+     on products, menus, flyers, packaging, anything.
+
+  Q: Do the QR codes expire?
+  A: No. Your QR code is static and works forever as long as the URL
+     it points to is active.
+
+  Q: Can I change the URL after downloading?
+  A: No — the URL is baked into the QR code. If you change your URL,
+     you'll need to generate a new code. (Dynamic QR codes are a future feature.)
+
+  Q: I paid but my download didn't work. Help?
+  A: Email us at support@[yoursite].com with your receipt and we'll sort it
+     out immediately.
+
+  Q: What file size do I get?
+  A: High-res PNG files are typically 200KB–1MB depending on complexity.
+     SVG files are under 50KB and scale perfectly to any size.
+
+------------------------------------------------------------
+FOOTER CONTENT
+------------------------------------------------------------
+
+  Left: Logo + tagline "Beautiful QR codes for everyone."
+
+  Links:
+    Product: Home / Pricing / Blog / Changelog
+    Support: FAQ / Contact / Refund Policy
+    Legal: Privacy Policy / Terms of Service
+
+  Social: Twitter/X | Instagram | ProductHunt
+
+  Bottom bar: "© 2026 [YourSiteName]. Made with ☕ by [Your Name]."
+
+================================================================================
+SECTION 8 — FEATURE LIST: MVP vs FULL VERSION
+================================================================================
+
+MVP (Build in 1–2 days):
+  ✓ URL input
+  ✓ Foreground color picker
+  ✓ Background color picker
+  ✓ 3 dot style options (square, rounded, dots)
+  ✓ Live preview
+  ✓ Free PNG download (watermarked, low-res)
+  ✓ Stripe payment link for high-res unlock
+  ✓ High-res PNG download after payment
+
+FULL VERSION (Add over 2–4 weeks):
+  ✓ Logo/image upload in center
+  ✓ SVG download
+  ✓ Gradient color support
+  ✓ Corner style customization (square/rounded/extra rounded)
+  ✓ 8+ dot styles
+  ✓ QR code type selector (URL, WiFi, email, phone, vCard, text)
+  ✓ Download history (requires account/localStorage)
+  ✓ Social sharing (share your QR code directly)
+  ✓ Dark mode
+  ✓ Bulk generation (CSV upload → multiple codes)
+  ✓ Analytics on scans (requires dynamic QR — needs backend)
+
+FUTURE / ADVANCED:
+  - User accounts with saved QR codes
+  - Dynamic QR codes (change destination without regenerating)
+  - API access for developers
+  - White-label for agencies
+  - Zapier / Make.com integration
+
+================================================================================
+SECTION 9 — LAUNCH STRATEGY
+================================================================================
+
+DAY 1: BUILD & DEPLOY
+  - Set up Vite + React project
+  - Integrate qr-code-styling library
+  - Add color pickers + basic customization
+  - Connect Stripe Payment Link
+  - Deploy to Vercel with custom domain
+  - Test payment flow end-to-end
+
+DAY 2–3: CONTENT & POLISH
+  - Write all copy (use this document as a guide)
+  - Add testimonials (make up plausible ones for launch, update with real ones)
+  - Add FAQ section
+  - Test on mobile
+  - Set up Google Analytics or Plausible
+
+LAUNCH WEEK:
+  Post on Reddit:
+    - r/entrepreneur ("I built a QR code customizer this weekend — feedback?")
+    - r/SideProject
+    - r/smallbusiness ("Made a tool for branded QR codes — free to try")
+    - r/wedding (if targeting that niche)
+
+  Post on Twitter/X:
+    - "I built [sitename] in 2 days — lets you make beautiful QR codes.
+       Try it free: [link] 🧵"
+    - Show a before/after (ugly free QR vs beautiful branded one)
+
+  ProductHunt:
+    - Submit on a Tuesday or Wednesday for best visibility
+    - Prepare a short description, 3 screenshots, and a 30-second GIF demo
+
+  WhatsApp & Telegram:
+    - Share in entrepreneur / startup / design groups
+
+  IndieHackers.com:
+    - Post a "Show IH" thread with your story and link
+
+================================================================================
+SECTION 10 — GROWTH & SCALING
+================================================================================
+
+AFTER FIRST $100:
+  - Reinvest in a small ad campaign ($20 on Reddit or Twitter)
+  - Add a referral mechanism ("Share this code, get a free download")
+  - Collect email addresses for a newsletter
+
+AFTER FIRST $500:
+  - Consider adding dynamic QR codes (requires a simple backend + DB)
+  - Add user accounts (Firebase Auth — free tier)
+  - Start a blog: "Best practices for QR codes" → SEO traffic
+
+SEO STRATEGY:
+  Target keywords:
+    - "free QR code generator with logo"
+    - "custom QR code color"
+    - "branded QR code generator"
+    - "QR code for restaurant menu"
+    - "wedding QR code"
+
+  Blog posts to write:
+    - "How to add your logo to a QR code (without it breaking)"
+    - "The best QR code colors for scannability"
+    - "5 creative ways restaurants are using QR codes in 2026"
+
+AFFILIATE PROGRAM (Later):
+  - Offer 30% commission to anyone who refers a paying user
+  - Use Rewardful or Lemon Squeezy's built-in affiliate tools
+
+================================================================================
+SECTION 11 — TOOLS & RESOURCES
+================================================================================
+
+DEVELOPMENT:
+  - Vite:              https://vitejs.dev
+  - qr-code-styling:   https://qr-code-styling.com
+  - Tailwind CSS:      https://tailwindcss.com
+  - react-color:       https://casesandberg.github.io/react-color
+
+PAYMENTS:
+  - Stripe:            https://stripe.com
+  - Lemon Squeezy:     https://lemonsqueezy.com
+
+HOSTING:
+  - Vercel:            https://vercel.com
+  - Namecheap:         https://namecheap.com (domains)
+
+ANALYTICS:
+  - Plausible:         https://plausible.io
+  - Google Analytics:  https://analytics.google.com
+
+DESIGN:
+  - Google Fonts:      https://fonts.google.com
+  - Heroicons:         https://heroicons.com (free icons)
+  - Unsplash:          https://unsplash.com (free stock photos)
+
+LAUNCH PLATFORMS:
+  - ProductHunt:       https://producthunt.com
+  - IndieHackers:      https://indiehackers.com
+  - AppSumo:           https://appsumo.com (for lifetime deals)
+  - Gumroad:           https://gumroad.com (alternative payment)
+
+INSPIRATION:
+  - qrbtf.com          (beautiful QR codes — study their design)
+  - qr-code-styling.com (your main library's demo)
+  - uniqode.com        (established competitor — see what to beat)
+
+================================================================================
+FINAL NOTES
+================================================================================
+
+  The goal is not perfection — it's SHIPPING.
+
+  A simple, working tool that looks clean and charges a fair price will
+  make money. Start with the MVP, get your first 10 paying customers,
+  then listen to what they ask for and build that next.
+
+  The best version 1 is the one that exists.
+
+  Good luck. Build it this weekend.
+
+================================================================================
+END OF DOCUMENT
+================================================================================

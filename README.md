@@ -22,6 +22,12 @@ Create branded QR codes with custom colors, dot styles, and logos.
 - **qr-code-styling**
 - **react-color**
 
+## Directory Structure
+
+- `qr-customizer/`: The main React + Vite + Tailwind CSS application.
+- `design.txt`: Design specifications.
+- `idea.txt`: Original project idea and blueprint.
+
 ## Getting Started
 
 ### Prerequisites
@@ -70,4 +76,3 @@ To enable payments:
 ## License
 
 MIT
-# QRCraft

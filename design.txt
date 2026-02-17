@@ -1,0 +1,863 @@
+================================================================================
+         QRCRAFT — PREMIUM DESIGN & AESTHETIC SYSTEM
+         A Complete Visual Identity & UI/UX Guide
+================================================================================
+
+Document Type: Design System & Aesthetic Blueprint
+Version: 1.0
+Tone Direction: Dark Luxury / Futuristic Precision / High-End SaaS
+
+================================================================================
+SECTION 1 — DESIGN PHILOSOPHY & DIRECTION
+================================================================================
+
+THE CORE AESTHETIC: "Dark Luxury Tech"
+──────────────────────────────────────
+Think: A high-end product studio meets a creative agency.
+Feel: Like opening a premium piece of software — confident, quiet, beautiful.
+Reference points:
+  - Linear.app (the gold standard of dark SaaS design)
+  - Vercel's website (bold typography, deep blacks, crisp whites)
+  - Arc Browser's marketing site (playful but refined)
+  - Raycast.com (depth, glow, premium dark UI)
+
+The goal is to make users feel like they're using a $99/month tool
+even though it costs $2.99. That perceived value gap = conversions.
+
+THE ONE THING USERS REMEMBER:
+  The glow. Every interactive element — hovered buttons, active inputs,
+  the QR code preview card — emits a soft purple glow. It feels alive.
+  It feels like the future. It's the signature of the brand.
+
+WHAT TO AVOID:
+  ✗ Plain white backgrounds with purple accents (too generic)
+  ✗ Rounded everything with no edge (too soft, no authority)
+  ✗ Gradients on gradients (chaotic, amateur)
+  ✗ Too many animations (distracting, slow-feeling)
+  ✗ Inter font everywhere (overused in SaaS, invisible, forgettable)
+  ✗ Cards that look like Bootstrap components (boring, free-tier energy)
+
+================================================================================
+SECTION 2 — COLOR SYSTEM
+================================================================================
+
+BASE PALETTE:
+─────────────
+  --black:        #000000   ← True black (hero section background)
+  --dark-base:    #080810   ← Near-black with a hint of indigo (main bg)
+  --dark-surface: #0F0F1A   ← Cards and panels
+  --dark-raised:  #161625   ← Elevated elements, dropdowns
+  --dark-border:  #1E1E35   ← Subtle borders
+  --dark-muted:   #2A2A45   ← Dividers, inactive states
+
+BRAND COLORS:
+─────────────
+  --purple-core:  #7C6EFA   ← Primary brand purple (slightly softer than #6C63FF)
+  --purple-light: #A89EFC   ← Hover states, highlights
+  --purple-dim:   #4A4490   ← Subtle purple tints on backgrounds
+  --purple-glow:  rgba(124, 110, 250, 0.15)  ← Box shadow glow color
+  --purple-glow-strong: rgba(124, 110, 250, 0.35) ← Intense glow on hover
+
+  --pink:         #FF6B8A   ← Accent, badges, "Most Popular" tag
+  --pink-glow:    rgba(255, 107, 138, 0.2)
+
+TEXT COLORS:
+────────────
+  --text-primary:   #FFFFFF        ← Headlines, important UI
+  --text-secondary: #B0B0CC        ← Body copy, descriptions
+  --text-muted:     #666680        ← Placeholders, captions, footnotes
+  --text-disabled:  #3A3A55        ← Inactive/disabled state
+
+FUNCTIONAL COLORS:
+──────────────────
+  --green:   #4ADE80   ← Success states ("Pro Unlocked", payment confirmed)
+  --red:     #FF4D6A   ← Error states
+  --yellow:  #FBBF24   ← Warnings
+
+GRADIENT DEFINITIONS:
+─────────────────────
+  Brand Gradient (headlines):
+    background: linear-gradient(135deg, #7C6EFA 0%, #FF6B8A 100%);
+
+  Subtle Background Gradient (hero section):
+    background: radial-gradient(ellipse at 20% 50%, rgba(124,110,250,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,107,138,0.05) 0%, transparent 50%),
+                #080810;
+
+  Card Glow Gradient (on hover):
+    background: linear-gradient(135deg, rgba(124,110,250,0.05) 0%, transparent 100%);
+
+  CTA Button Gradient:
+    background: linear-gradient(135deg, #7C6EFA 0%, #9B8FFD 100%);
+
+BACKGROUND TEXTURE:
+───────────────────
+  Add a subtle noise texture overlay to the main background using CSS:
+  Use a 200x200px noise SVG (base64 encoded) at 3% opacity.
+  This adds depth and prevents the flat digital look.
+
+  CSS:
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,...noise svg...");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+================================================================================
+SECTION 3 — TYPOGRAPHY SYSTEM
+================================================================================
+
+FONT PAIRING:
+─────────────
+  DISPLAY (headlines, hero text):
+    Font: "Syne" — Google Fonts
+    Weight: 700, 800
+    Character: Geometric, modern, slightly quirky. High-end editorial energy.
+    Used for: H1, H2, logo wordmark
+
+  BODY (paragraphs, UI labels):
+    Font: "DM Sans" — Google Fonts
+    Weight: 400, 500, 600
+    Character: Clean, neutral but with personality. More interesting than Inter.
+    Used for: All body text, buttons, inputs, nav links
+
+  MONO (URL inputs, code, technical):
+    Font: "JetBrains Mono" — Google Fonts
+    Weight: 400, 500
+    Character: Technical precision. Feels intentional in the URL input field.
+    Used for: URL/text input fields, hex color values
+
+Google Fonts import string:
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+TYPE SCALE:
+───────────
+  --text-xs:   11px / 0.6875rem  (captions, badges)
+  --text-sm:   13px / 0.8125rem  (labels, helper text)
+  --text-base: 15px / 0.9375rem  (body copy)
+  --text-lg:   17px / 1.0625rem  (lead text, subtitles)
+  --text-xl:   20px / 1.25rem    (card titles)
+  --text-2xl:  24px / 1.5rem     (section subtitles)
+  --text-3xl:  32px / 2rem       (section headings)
+  --text-4xl:  44px / 2.75rem    (page titles)
+  --text-5xl:  60px / 3.75rem    (hero headline desktop)
+  --text-6xl:  80px / 5rem       (hero headline large screens)
+
+LINE HEIGHT:
+────────────
+  Headlines: 1.1 (tight, editorial)
+  Body: 1.65 (comfortable reading)
+  UI Labels: 1.2 (compact)
+
+LETTER SPACING:
+───────────────
+  Headlines (Syne): -0.03em (slightly condensed = premium)
+  Uppercase labels: 0.08em (slightly spaced = refined)
+  Body: 0 (natural)
+
+GRADIENT TEXT (hero headline):
+───────────────────────────────
+  .gradient-text {
+    background: linear-gradient(135deg, #7C6EFA 0%, #FF6B8A 60%, #FFAA5E 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textShimmer 4s linear infinite;
+  }
+
+  @keyframes textShimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+================================================================================
+SECTION 4 — SPACING & LAYOUT SYSTEM
+================================================================================
+
+SPATIAL PHILOSOPHY:
+───────────────────
+  Generous whitespace signals premium. Cramped UI signals cheap.
+  Every section breathes. Padding is never less than 24px.
+  Max content width: 1200px (centered with auto margins)
+
+SPACING SCALE (use multiples of 4px):
+──────────────────────────────────────
+  4px   — micro (icon gaps, inline spacing)
+  8px   — tight (between label and input)
+  12px  — close (within a card section)
+  16px  — base (general padding unit)
+  24px  — comfortable (card padding small)
+  32px  — spacious (card padding large)
+  48px  — section padding (top/bottom of cards)
+  64px  — section gap (between major sections)
+  96px  — large section (hero padding)
+  128px — XL section (hero on large screens)
+
+BORDER RADIUS:
+──────────────
+  --radius-sm:  6px   (tags, badges, small chips)
+  --radius-md:  12px  (buttons, inputs)
+  --radius-lg:  16px  (cards, panels)
+  --radius-xl:  24px  (large cards, modal)
+  --radius-2xl: 32px  (hero card, feature panels)
+  --radius-full: 9999px (pills, avatars, toggles)
+
+LAYOUT GRID:
+────────────
+  Mobile:  Single column, 16px side padding
+  Tablet:  12-column grid, 24px gutters
+  Desktop: 12-column grid, 32px gutters, max-width 1200px
+
+CARD ANATOMY:
+─────────────
+  Standard card:
+    background: var(--dark-surface)
+    border: 1px solid var(--dark-border)
+    border-radius: var(--radius-lg)
+    padding: 24px 28px
+
+  Elevated card (feature cards, pricing):
+    Same as above +
+    box-shadow: 0 0 0 1px rgba(124,110,250,0.1),
+                0 4px 24px rgba(0,0,0,0.4)
+
+  Glowing card (QR preview, hero demo):
+    Same as elevated +
+    box-shadow: 0 0 0 1px rgba(124,110,250,0.2),
+                0 0 40px rgba(124,110,250,0.1),
+                0 16px 48px rgba(0,0,0,0.5)
+
+================================================================================
+SECTION 5 — COMPONENT DESIGN SPECIFICATIONS
+================================================================================
+
+────────────────────────────────────────
+HEADER / NAVIGATION
+────────────────────────────────────────
+Height: 64px
+Position: sticky top-0 z-50
+Background: rgba(8, 8, 16, 0.8) — semi-transparent dark
+Backdrop: backdrop-filter: blur(20px) saturate(180%)
+Border bottom: 1px solid rgba(30, 30, 53, 0.8)
+
+Logo area:
+  - A small abstract QR-pattern icon (3x3 grid of squares, top-left and bottom-left corners filled, rest scattered)
+  - Icon color: gradient from --purple-core to --pink
+  - "QRcraft" wordmark in Syne 700, white
+  - 4px gap between icon and text
+
+Nav links:
+  - DM Sans 500, --text-muted color by default
+  - Hover: --text-primary + underline that slides in from left
+  - Transition: color 150ms ease, text-decoration 200ms ease
+
+CTA button (header):
+  - "Get Started" — small, compact
+  - Background: transparent with 1px solid rgba(124,110,250,0.5) border
+  - Text: --purple-light
+  - Padding: 8px 16px, radius: --radius-full
+  - Hover: bg changes to rgba(124,110,250,0.15), border becomes solid purple
+  - Transition: all 200ms ease
+
+────────────────────────────────────────
+HERO SECTION
+────────────────────────────────────────
+Background: The radial gradient defined in Section 2 (NOT solid black)
+Padding: 120px top, 80px bottom (desktop)
+
+Pre-headline badge:
+  - Small pill: "✦ No account needed — free to try"
+  - Border: 1px solid rgba(124,110,250,0.3)
+  - Background: rgba(124,110,250,0.08)
+  - Text: --purple-light, font-size: 13px, letter-spacing: 0.02em
+  - The "✦" symbol adds a luxury decorative touch
+
+H1 Headline:
+  - Font: Syne 800
+  - Size: clamp(44px, 6vw, 80px)
+  - Line-height: 1.05
+  - Letter-spacing: -0.03em
+  - Line 1: "QR Codes That" — plain white
+  - Line 2: "Actually Look Good" — gradient-text class
+
+Sub-headline:
+  - DM Sans 400, --text-secondary, 18px, max-width: 480px
+  - Line-height: 1.6
+
+Hero CTA button (primary):
+  See button design in Section 5 — PRIMARY BUTTON
+
+Demo QR code card (right side):
+  - Floating card with strong purple glow
+  - Contains an actual rendered QR code (purple dots, rounded style)
+  - Rotated very slightly: transform: rotate(-2deg)
+  - Hovering straightens it: hover:rotate(0deg) with transition
+  - Small label below: "← This took 20 seconds to make"
+  - The card has a thin animated border that cycles through
+    purple → pink → purple using CSS keyframes
+
+────────────────────────────────────────
+BUTTONS
+────────────────────────────────────────
+
+PRIMARY BUTTON:
+  Background: linear-gradient(135deg, #7C6EFA, #9B8FFD)
+  Text: white, DM Sans 600, 15px
+  Padding: 14px 28px (regular), 16px 36px (large/hero)
+  Border-radius: --radius-full
+  Border: none
+  Box-shadow: 0 0 20px rgba(124,110,250,0.3)
+  Hover:
+    transform: translateY(-2px)
+    box-shadow: 0 0 32px rgba(124,110,250,0.5)
+    background: linear-gradient(135deg, #8B80FB, #ABA0FE)
+  Active:
+    transform: translateY(0px)
+  Transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)
+    (The cubic-bezier creates a slight spring/bounce on hover — premium feel)
+
+SECONDARY BUTTON (outlined):
+  Background: transparent
+  Border: 1px solid var(--dark-border)
+  Text: --text-secondary, DM Sans 500
+  Padding: same as primary
+  Border-radius: same
+  Hover:
+    border-color: var(--purple-core)
+    color: white
+    background: rgba(124,110,250,0.08)
+
+GHOST BUTTON (text only):
+  Background: transparent
+  Border: none
+  Text: --text-muted
+  Hover: --text-primary
+  Underline on hover
+
+ICON BUTTON (square/circle):
+  Background: var(--dark-raised)
+  Border: 1px solid var(--dark-border)
+  Padding: 10px
+  Border-radius: --radius-md
+  Hover: border-color rgba(124,110,250,0.4), background var(--dark-surface)
+
+────────────────────────────────────────
+INPUT FIELDS
+────────────────────────────────────────
+Background: var(--dark-base)
+Border: 1px solid var(--dark-border)
+Border-radius: --radius-md
+Padding: 12px 16px
+Font: JetBrains Mono 400 (for URL inputs), DM Sans (for others)
+Color: --text-primary
+Font-size: 14px
+Caret-color: var(--purple-core)
+
+Placeholder text:
+  Color: var(--text-disabled)
+  Font-style: normal (NOT italic)
+
+Focus state:
+  border-color: var(--purple-core)
+  box-shadow: 0 0 0 3px rgba(124,110,250,0.15)
+  outline: none
+  background: rgba(124,110,250,0.03) — very subtle tint
+
+Error state:
+  border-color: var(--red)
+  box-shadow: 0 0 0 3px rgba(255,77,106,0.15)
+
+Transition: border-color 150ms ease, box-shadow 150ms ease
+
+────────────────────────────────────────
+MAIN QR TOOL — LEFT PANEL (CONTROLS)
+────────────────────────────────────────
+Width: 42% on desktop
+Background: var(--dark-surface)
+Border: 1px solid var(--dark-border)
+Border-radius: --radius-2xl
+Padding: 32px
+Overflow: auto (scrollable if content is tall)
+
+Section dividers within the panel:
+  1px solid rgba(30,30,53,0.6) — very subtle
+
+Control section header (e.g., "QR Color"):
+  Font: DM Sans 500, 12px, letter-spacing: 0.06em
+  Color: --text-muted
+  Text-transform: uppercase
+  Margin-bottom: 10px
+
+Tab row (QR Type selector):
+  Pill-shaped container with dark background
+  Each tab: flex-1, centered text, rounded
+  Active: background var(--purple-core), text white
+  Inactive: background transparent, text --text-muted
+  Hover inactive: text --text-secondary
+  Transition: background 150ms, color 150ms
+
+Dot style selector (5 options):
+  Each option: 56x56px box
+  Shows the style name in small text + a tiny illustrative icon/shape
+  Unselected: bg var(--dark-raised), border var(--dark-border)
+  Selected: border 2px solid var(--purple-core), bg rgba(124,110,250,0.08)
+  Hover: border rgba(124,110,250,0.4)
+  Border-radius: --radius-md
+
+Color swatch button:
+  36x36px circle
+  The circle IS the color (background = current color value)
+  Surrounded by a 2px gap + 1px border matching the swatch color at 40% opacity
+  Hover: scale(1.1)
+  Clicking opens the color picker in a floating panel below
+
+Color picker panel (floating):
+  Background: var(--dark-raised)
+  Border: 1px solid var(--dark-border)
+  Border-radius: --radius-lg
+  Padding: 16px
+  Box-shadow: 0 16px 48px rgba(0,0,0,0.6)
+  Contains: react-color ChromePicker (style overridden to match dark theme)
+
+Error correction toggle (L/M/Q/H):
+  Small 4-segment pill — same pattern as tab row
+  Width: fit-content
+  Each segment: 32px wide
+
+Logo upload zone:
+  Border: 2px dashed rgba(30,30,53,0.8)
+  Border-radius: --radius-lg
+  Padding: 24px
+  Background: transparent
+  Center-aligned icon + text
+  Hover: border-color rgba(124,110,250,0.4), bg rgba(124,110,250,0.04)
+  Active drag-over: border-color var(--purple-core), bg rgba(124,110,250,0.08)
+  Transition: all 200ms ease
+
+  Lock overlay (free tier):
+    Position: absolute, inset-0, border-radius inherited
+    Background: rgba(8,8,16,0.85)
+    Backdrop: blur(2px)
+    Center: lock icon (large, purple) + "Pro Feature" label + unlock button
+    The underlying content is faintly visible through the blur
+
+────────────────────────────────────────
+MAIN QR TOOL — RIGHT PANEL (PREVIEW)
+────────────────────────────────────────
+Width: 58% on desktop
+Display: flex flex-col items-center justify-center
+
+QR Code display card:
+  Background: white (the QR code needs a white/light background)
+  Border-radius: --radius-2xl
+  Padding: 32px
+  Box-shadow: 0 0 0 1px rgba(124,110,250,0.2),
+              0 0 60px rgba(124,110,250,0.12),
+              0 24px 64px rgba(0,0,0,0.6)
+  The white card floats on the dark background — strong contrast
+  Max-width: 340px
+
+  Inner QR code: 280x280px
+
+  Below QR inside white card:
+    Small gray text: "Scan to test" with a small scan icon
+    Updates to the actual destination URL (truncated to 30 chars)
+
+Download section (below white card, on dark background):
+  "Free Preview" pill badge:
+    Border: 1px solid rgba(102,102,128,0.4)
+    Color: --text-muted
+    Font-size: 11px
+    Letter-spacing: 0.05em
+
+  "✓ Pro Unlocked" badge (when paid):
+    Border: 1px solid rgba(74,222,128,0.4)
+    Background: rgba(74,222,128,0.08)
+    Color: var(--green)
+
+  Download buttons: full-width, stacked
+    PNG button: PRIMARY BUTTON style (purple gradient)
+    SVG button: SECONDARY BUTTON style (outlined)
+    8px gap between them
+
+────────────────────────────────────────
+PAYWALL MODAL
+────────────────────────────────────────
+Overlay:
+  position: fixed, inset: 0, z-index: 100
+  background: rgba(0, 0, 0, 0.75)
+  backdrop-filter: blur(8px)
+  Animation: fadeIn 200ms ease
+
+Modal card:
+  max-width: 420px, centered horizontally
+  margin-top: auto / margin-bottom: auto (vertically centered)
+  background: linear-gradient(180deg, #161625 0%, #0F0F1A 100%)
+  border: 1px solid rgba(124,110,250,0.2)
+  border-radius: --radius-2xl
+  padding: 40px 36px
+  box-shadow: 0 0 0 1px rgba(124,110,250,0.1),
+              0 0 80px rgba(124,110,250,0.15),
+              0 32px 64px rgba(0,0,0,0.8)
+  Animation: slideUp 300ms cubic-bezier(0.34, 1.56, 0.64, 1)
+
+  @keyframes slideUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+Lock icon:
+  64x64px centered container
+  Background: rgba(124,110,250,0.1)
+  Border: 1px solid rgba(124,110,250,0.2)
+  Border-radius: 50%
+  The lock SVG icon inside: color var(--purple-core), 28px
+
+Price display:
+  "$2.99" — Syne 800, 48px, gradient-text class
+  "one-time · no subscription" — DM Sans 400, --text-muted, 13px
+
+Feature list:
+  Each item: checkmark icon (green) + feature text
+  Checkmark: a filled green circle with a white checkmark inside
+  Text: DM Sans 400, --text-secondary, 14px
+  Vertical gap: 10px between items
+
+────────────────────────────────────────
+PRICING CARDS
+────────────────────────────────────────
+All three cards share:
+  Background: var(--dark-surface)
+  Border: 1px solid var(--dark-border)
+  Border-radius: --radius-xl
+  Padding: 28px 24px
+
+FREE CARD:
+  Standard dark card, no special treatment
+
+SINGLE DOWNLOAD CARD (featured/middle):
+  Border: 1px solid rgba(124,110,250,0.4)
+  Box-shadow: 0 0 40px rgba(124,110,250,0.1)
+  Transform: scale(1.04) — slightly larger
+  Background: linear-gradient(180deg, rgba(124,110,250,0.06) 0%, var(--dark-surface) 100%)
+  "Most Popular" badge:
+    Position: absolute, top: -12px, centered
+    Background: var(--pink)
+    Color: white
+    Font: DM Sans 600, 11px, letter-spacing: 0.04em
+    Padding: 4px 12px
+    Border-radius: --radius-full
+
+5-PACK CARD:
+  Standard styling with a subtle yellow/gold accent instead of purple
+  Border: 1px solid rgba(251,191,36,0.2)
+  Signals "value" — different from the purple premium main tier
+
+Price display in cards:
+  Currency symbol: DM Sans 400, 18px, --text-muted, aligned top
+  Number: Syne 800, 40px, white
+  Period: DM Sans 400, 14px, --text-muted ("/download")
+
+Feature check items in cards:
+  ✓ items: green icon + --text-secondary text
+  ✗ items: dark red/muted X icon + --text-disabled text, opacity: 0.5
+
+────────────────────────────────────────
+USE CASE CARDS
+────────────────────────────────────────
+Grid: 2 columns on tablet+, 1 column mobile
+Gap: 20px
+
+Each card:
+  Background: var(--dark-surface)
+  Border: 1px solid var(--dark-border)
+  Border-radius: --radius-xl
+  Padding: 28px
+  Position: relative
+  Overflow: hidden
+
+  Decorative accent (top-left corner):
+    A small colored square (20x20px) in the corner, rotated 45deg
+    Color: var(--purple-core) at 60% opacity
+    This adds a subtle branded detail without being loud
+
+  Emoji icon: 28px, placed in a 48x48 rounded square
+    Background: rgba(124,110,250,0.1)
+    Border: 1px solid rgba(124,110,250,0.15)
+
+  Title: DM Sans 600, 16px, white
+  Body: DM Sans 400, 14px, --text-secondary, line-height 1.6
+
+  Hover:
+    border-color: rgba(124,110,250,0.3)
+    transform: translateY(-3px)
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4)
+  Transition: all 250ms ease
+
+────────────────────────────────────────
+FAQ ACCORDION
+────────────────────────────────────────
+Container: max-width 680px, centered
+Each item:
+  Border-bottom: 1px solid var(--dark-border)
+  Padding: 20px 0
+
+Question row:
+  Display: flex, justify-between, align-items center
+  Question text: DM Sans 500, 15px, --text-primary
+  Arrow icon: custom SVG chevron, --text-muted color
+  Cursor: pointer
+  Hover question text: --text-primary (already white, so no change needed)
+  Hover row: background rgba(124,110,250,0.03) — barely perceptible
+
+Open state:
+  Arrow rotates 180deg (CSS transform transition)
+  Answer section: max-height animates from 0 to full height
+
+Answer text:
+  DM Sans 400, 14px, --text-secondary, line-height 1.7
+  Padding-top: 12px
+
+================================================================================
+SECTION 6 — ANIMATION & MOTION SYSTEM
+================================================================================
+
+PHILOSOPHY:
+───────────
+  Motion should feel like physics — natural, purposeful, never random.
+  Every animation serves the UI: it guides attention, confirms actions,
+  or adds tactile feedback. Nothing moves for pure decoration.
+
+EASING CURVES:
+──────────────
+  Standard:     cubic-bezier(0.16, 1, 0.3, 1)        — fast out, smooth settle
+  Spring:       cubic-bezier(0.34, 1.56, 0.64, 1)    — slight overshoot (buttons)
+  Sharp:        cubic-bezier(0.4, 0, 0.2, 1)          — Material standard
+  Linear:       linear                                  — Continuous loops only
+
+DURATIONS:
+──────────
+  Instant:      0ms   — No transition (tab switches, state-only changes)
+  Fast:         150ms — Hover states, small color changes
+  Standard:     250ms — Button transforms, card hovers
+  Medium:       350ms — Modal entry, panel slides
+  Slow:         500ms — Page-level transitions, large reveals
+  Crawl:        3000ms+ — Background shimmer, badge pulses (looping)
+
+PAGE LOAD ANIMATION (staggered reveal):
+────────────────────────────────────────
+  Header:   fadeIn + slideDown(8px), delay: 0ms, duration: 400ms
+  Hero badge:   fadeIn + slideUp(16px), delay: 100ms
+  Hero H1:      fadeIn + slideUp(24px), delay: 200ms
+  Hero subline: fadeIn + slideUp(16px), delay: 320ms
+  Hero CTA:     fadeIn + slideUp(12px), delay: 440ms
+  Hero QR card: fadeIn + scale(0.95→1) + slideRight(24px), delay: 300ms
+
+  CSS pattern:
+  .animate-in {
+    animation: slideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+QR CODE UPDATE ANIMATION:
+──────────────────────────
+  When the QR code regenerates (user typed new URL or changed color):
+  1. Current QR fades out: opacity 1→0, scale 1→0.97, duration 100ms
+  2. New QR fades in: opacity 0→1, scale 0.97→1, duration 200ms
+  This creates a smooth "blink" effect that feels intentional.
+
+  CSS on the QR container:
+  transition: opacity 150ms ease, transform 150ms ease;
+
+BUTTON HOVER (spring bounce):
+──────────────────────────────
+  transform: translateY(-2px) scale(1.01)
+  Transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)
+  The spring curve makes it feel like pressing a physical button.
+
+PAYWALL MODAL ENTRY:
+─────────────────────
+  Overlay: fadeIn 200ms
+  Card: translateY(32px)→(0) + scale(0.96→1) + opacity(0→1)
+  Duration: 350ms spring curve
+  Creates a satisfying "drop into place" feel.
+
+GLOW PULSE (hero QR demo card border):
+────────────────────────────────────────
+  @keyframes borderPulse {
+    0%   { box-shadow: 0 0 0 1px rgba(124,110,250,0.3), 0 0 20px rgba(124,110,250,0.1); }
+    50%  { box-shadow: 0 0 0 1px rgba(255,107,138,0.4), 0 0 30px rgba(255,107,138,0.15); }
+    100% { box-shadow: 0 0 0 1px rgba(124,110,250,0.3), 0 0 20px rgba(124,110,250,0.1); }
+  }
+  animation: borderPulse 3s ease-in-out infinite;
+
+TEXT SHIMMER (gradient headline):
+───────────────────────────────────
+  @keyframes textShimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  animation: textShimmer 4s linear infinite;
+  background-size: 200% auto;
+
+SCROLL-TRIGGERED REVEALS:
+───────────────────────────
+  Use IntersectionObserver to add a class "visible" when element enters viewport.
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 500ms ease, transform 500ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  Apply to: use case cards (staggered by 80ms each), pricing cards, FAQ items.
+
+================================================================================
+SECTION 7 — MICRO-DETAIL CHECKLIST
+================================================================================
+
+These are the tiny things that separate "good" from "premium":
+
+CURSORS:
+  ☐ pointer cursor on all clickable elements (not just <a> and <button>)
+  ☐ text cursor only on text inputs
+  ☐ default on cards and non-interactive surfaces
+
+FOCUS STATES (accessibility + premium feel):
+  ☐ All focusable elements have a visible ring:
+    outline: 2px solid rgba(124,110,250,0.6)
+    outline-offset: 3px
+  ☐ Never use outline: none without a replacement
+
+SELECTION COLOR:
+  ::selection {
+    background: rgba(124,110,250,0.3);
+    color: white;
+  }
+  The purple selection color is a subtle brand touch.
+
+SCROLLBAR (WebKit):
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark-base); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--dark-muted);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--purple-dim); }
+
+INPUT AUTOFILL OVERRIDE:
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 100px var(--dark-base) inset;
+    -webkit-text-fill-color: white;
+  }
+  Prevents the ugly yellow/blue autofill background.
+
+LOADING STATE (download button):
+  When user clicks download, show a spinner for 500ms before file downloads.
+  The spinner: a 16px circle with a 2px purple border, top segment white, rotating.
+  This creates a tactile sense that something is happening.
+
+EMPTY STATE (no URL entered):
+  Show the QR code with example content (https://qrcraft.io).
+  QR code is not blank — it's always showing something beautiful.
+
+COLOR PICKER DARK THEME OVERRIDE:
+  The react-color ChromePicker has a white background by default.
+  Override its CSS:
+    .chrome-picker { background: var(--dark-raised) !important; border-radius: 12px !important; }
+    .chrome-picker input { background: var(--dark-base) !important; color: white !important; }
+
+SMOOTH SCROLLING:
+  html { scroll-behavior: smooth; }
+  scroll-padding-top: 80px (account for sticky header height)
+
+NUMBER FORMATTING:
+  Prices always show exactly 2 decimal places: "$2.99" not "$2.9"
+
+BUTTON DISABLED STATE:
+  opacity: 0.4
+  cursor: not-allowed
+  pointer-events: none
+
+================================================================================
+SECTION 8 — SECTION-BY-SECTION VISUAL SUMMARY
+================================================================================
+
+READING ORDER: Top to bottom, here's what the eye sees:
+
+[HEADER]
+  Dark blur strip — logo left, nav center-right — thin bottom border
+
+[HERO]
+  Deep dark bg with barely-visible radial purple glow behind left content
+  LEFT: Badge pill → giant two-line headline (white + gradient) →
+        gray subtext → big purple CTA button → checkmarks row
+  RIGHT: Floating white card (slightly rotated) with purple-glow QR code
+         inside. A small label below it.
+  Bottom of hero: very subtle horizontal fade to next section
+
+[QR TOOL SECTION]
+  Full-width dark section
+  Centered title + subtitle above
+  Two-panel card — left (controls/dark), right (preview/white QR card)
+  The white preview card glows softly in the dark room effect
+
+[USE CASES]
+  Dark background, same as main
+  "Perfect for any situation" heading
+  2x2 grid of dark cards with emoji icons
+  Subtle purple corner accents on each card
+
+[PRICING]
+  Slightly lighter dark — var(--dark-surface) background for contrast
+  3 cards: left flat, middle featured (purple glow, scaled up), right subtle gold
+  Clean feature lists with green checks and muted X marks
+
+[FAQ]
+  Back to dark background
+  Narrow column (max 680px), centered
+  Clean accordion lines
+
+[FOOTER]
+  Darkest section (var(--dark-base) or --black)
+  Three columns, generous padding
+  Very subtle top border
+  Copyright line centered at bottom
+
+================================================================================
+SECTION 9 — CURSOR IMPLEMENTATION INSTRUCTIONS
+================================================================================
+
+When you paste this design guide into Cursor, prepend with:
+
+"Read this entire design guide. Then apply every specification to the existing
+QRcraft codebase. Update all colors, fonts, animations, spacing, and component
+styles to match exactly. Do not skip any section. Where the existing code
+conflicts with this guide, the guide wins. Rewrite CSS/Tailwind classes as
+needed. Do not change any functionality — only the visual design."
+
+KEY THINGS TO TELL CURSOR TO PRIORITIZE:
+  1. Replace Inter with Syne (headlines) + DM Sans (body) + JetBrains Mono (inputs)
+  2. Replace all #6C63FF with #7C6EFA (slightly refined purple)
+  3. Add the noise texture overlay to body::before
+  4. Add the hero radial gradient background
+  5. Implement the glow box-shadows on interactive cards
+  6. Add the spring cubic-bezier to all button transitions
+  7. Override react-color ChromePicker to dark theme
+  8. Implement the QR code blink animation on content update
+  9. Add scroll-triggered reveal animations to cards sections
+  10. Add custom scrollbar + selection color + autofill override
+
+================================================================================
+END OF DESIGN GUIDE
+================================================================================
