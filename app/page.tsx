@@ -23,12 +23,22 @@ export default function Home() {
   // Dynamic QR Codes State (Client-side mock DB)
   const [dynamicCodes, setDynamicCodes] = useState([])
 
-  // Step 5: Stripe Integration
+  // Step 5: URL State & Stripe Integration
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
+
+      // Handle Payments
       if (params.get('paid') === 'true') {
         updateConfig('hasPaid', true)
+        window.history.replaceState({}, '', '/')
+      }
+
+      // Handle Redirect Tabs (e.g. from /dashboard route)
+      const tab = params.get('tab')
+      if (tab === 'dashboard' || tab === 'analytics' || tab === 'about') {
+        setCurrentPage(tab)
+        // Clean up URL for clean PWA feel
         window.history.replaceState({}, '', '/')
       }
     }
