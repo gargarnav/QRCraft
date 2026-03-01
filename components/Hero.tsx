@@ -7,7 +7,7 @@ import QRCodeStyling from 'qr-code-styling'
 
 
 export default function Hero({ setCurrentPage }: any) {
-    const qrRef = useRef(null)
+    const qrRef = useRef<any>(null)
 
     useEffect(() => {
         // Render static example QR code on mount

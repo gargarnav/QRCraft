@@ -5,10 +5,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-export default function Header({ currentPage, setCurrentPage, hasDynamicCodes }) {
+export default function Header({ currentPage, setCurrentPage, hasDynamicCodes }: any) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-    const handleNav = (page, sectionId = null) => {
+    const handleNav = (page: any, sectionId: any = null) => {
         setMobileMenuOpen(false)
         setCurrentPage(page)
 
