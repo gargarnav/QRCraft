@@ -1,8 +1,8 @@
-"use client";
 // @ts-nocheck
+"use client";
 
 
-import {  useEffect, useRef  } from 'react'
+import { useEffect, useRef } from 'react'
 
 
 export default function UseCases() {
@@ -41,7 +41,9 @@ export default function UseCases() {
                     {cases.map((item, index) => (
                         <div
                             key={index}
-                            ref={el => scrollRef.current[index] = el}
+                            ref={(el: HTMLDivElement | null) => {
+                                scrollRef.current[index] = el as never;
+                            }}
                             className="bg-card w-full border border-border rounded-2xl p-8 relative overflow-hidden group hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 opacity-0 translate-y-8"
                             style={{ transitionDelay: `${index * 100}ms` }}
                         >

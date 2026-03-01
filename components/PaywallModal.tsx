@@ -1,5 +1,5 @@
-"use client";
 // @ts-nocheck
+"use client";
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_LINK_HERE"
 
