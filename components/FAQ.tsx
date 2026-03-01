@@ -2,7 +2,7 @@
 // @ts-nocheck
 
 
-import {  useState  } from 'react'
+import { useState } from 'react'
 
 const faqs = [
     {
@@ -37,7 +37,7 @@ const faqs = [
 
 
 export default function FAQ() {
-    const [openIndex, setOpenIndex] = useState(null)
+    const [openIndex, setOpenIndex] = useState<number | null>(null)
 
     return (
         <section className="py-24 bg-dark">
