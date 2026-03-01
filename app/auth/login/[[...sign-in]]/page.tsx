@@ -1,8 +1,9 @@
-import { SignUp } from "@clerk/nextjs";
+import { SignIn } from "@clerk/nextjs";
 
-export default function SignUpPage() {
+export default function LoginPage() {
     return (
-        <SignUp
+        <SignIn
+            path="/auth/login"
             appearance={{
                 elements: {
                     rootBox: "w-full mx-auto",
