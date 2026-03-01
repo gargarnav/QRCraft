@@ -1,13 +1,13 @@
 "use client";
-// @ts-nocheck
+// @ts-nocheck// @ts-nocheck
 
 
-import {  useState, useRef, useEffect  } from 'react'
-import {  ChromePicker  } from 'react-color'
-import {  nanoid  } from 'nanoid'
+import { useState, useRef, useEffect } from 'react'
+import { ChromePicker } from 'react-color'
+import { nanoid } from 'nanoid'
 
 
-export default function Controls({ config, updateConfig, dynamicCodes, setDynamicCodes }) {
+export default function Controls({ config, updateConfig, dynamicCodes, setDynamicCodes }: any) {
     const [showFgPicker, setShowFgPicker] = useState(false)
     const [showBgPicker, setShowBgPicker] = useState(false)
     const [localContent, setLocalContent] = useState(config.content)

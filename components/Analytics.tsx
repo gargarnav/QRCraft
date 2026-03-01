@@ -1,9 +1,9 @@
 "use client";
-// @ts-nocheck
+// @ts-nocheck// @ts-nocheck
 
 
 import React from 'react'
-import {  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell  } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
 import PaywallModal from '@/components/PaywallModal'
 
 const generateMockScans = (days = 30) => {
@@ -31,7 +31,7 @@ const mockCountries = [
 
 
 
-export default function Analytics({ hasPaid, setCurrentPage }) {
+export default function Analytics({ hasPaid, setCurrentPage }: any) {
     if (!hasPaid) {
         return (
             <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">

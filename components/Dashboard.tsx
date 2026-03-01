@@ -1,11 +1,11 @@
 "use client";
-// @ts-nocheck
+// @ts-nocheck// @ts-nocheck
 
 
-import React, { useState  } from 'react'
+import React, { useState } from 'react'
 
 
-export default function Dashboard({ dynamicCodes, setDynamicCodes, setCurrentPage }) {
+export default function Dashboard({ dynamicCodes, setDynamicCodes, setCurrentPage }: any) {
     const [editingCode, setEditingCode] = useState(null)
     const [newDest, setNewDest] = useState('')
 

@@ -1,11 +1,11 @@
 "use client";
-// @ts-nocheck
+// @ts-nocheck// @ts-nocheck
 
 
 import React from 'react'
 
 
-export default function About({ setCurrentPage }) {
+export default function About({ setCurrentPage }: any) {
     return (
         <div className="bg-dark text-textLight min-h-screen">
             {/* HER0 SECTION */}

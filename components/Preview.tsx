@@ -1,13 +1,13 @@
 "use client";
-// @ts-nocheck
+// @ts-nocheck// @ts-nocheck
 
 
-import {  useEffect, useRef, useState  } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import QRCodeStyling from 'qr-code-styling'
 import PaywallModal from '@/components/PaywallModal'
 
 
-export default function Preview({ config, updateConfig }) {
+export default function Preview({ config, updateConfig }: any) {
     const qrRef = useRef(null)
     const [qrCode] = useState(new QRCodeStyling({
         width: 2000,

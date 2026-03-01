@@ -1,12 +1,5 @@
-"use client";
 // @ts-nocheck
-
-
-
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_LINK_HERE"
-
-
-export default function PaywallModal({ isOpen, onClose }) {
+export default function PaywallModal({ isOpen, onClose }: any) {
     if (!isOpen) return null
 
     return (
