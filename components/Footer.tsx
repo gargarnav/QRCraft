@@ -3,7 +3,7 @@
 
 
 
-export default function Footer() {
+export default function Footer({ setCurrentPage }: any) {
     const scrollToSection = (id) => {
         const element = document.getElementById(id)
         if (element) {

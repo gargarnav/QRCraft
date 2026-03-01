@@ -2,11 +2,11 @@
 // @ts-nocheck
 
 
-import {  useEffect, useRef  } from 'react'
+import { useEffect, useRef } from 'react'
 import QRCodeStyling from 'qr-code-styling'
 
 
-export default function Hero() {
+export default function Hero({ setCurrentPage }: any) {
     const qrRef = useRef(null)
 
     useEffect(() => {
