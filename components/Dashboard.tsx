@@ -9,19 +9,19 @@ export default function Dashboard({ dynamicCodes, setDynamicCodes, setCurrentPag
     const [editingCode, setEditingCode] = useState(null)
     const [newDest, setNewDest] = useState('')
 
-    const handleDelete = (shortcode) => {
+    const handleDelete = (shortcode: any) => {
         if (confirm('Are you sure you want to delete this Dynamic QR Code? This action cannot be undone.')) {
-            setDynamicCodes(prev => prev.filter(c => c.shortcode !== shortcode))
+            setDynamicCodes((prev: any) => prev.filter((c: any) => c.shortcode !== shortcode))
         }
     }
 
-    const startEdit = (code) => {
+    const startEdit = (code: any) => {
         setEditingCode(code.shortcode)
         setNewDest(code.destination)
     }
 
-    const saveEdit = (shortcode) => {
-        setDynamicCodes(prev => prev.map(c =>
+    const saveEdit = (shortcode: any) => {
+        setDynamicCodes((prev: any) => prev.map((c: any) =>
             c.shortcode === shortcode ? { ...c, destination: newDest } : c
         ))
         setEditingCode(null)
@@ -66,7 +66,7 @@ export default function Dashboard({ dynamicCodes, setDynamicCodes, setCurrentPag
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
-                                {dynamicCodes.map(code => (
+                                {dynamicCodes.map((code: any) => (
                                     <tr key={code.shortcode} className="hover:bg-white/5 transition-colors">
                                         <td className="px-6 py-4">
                                             {/* Thumbnail Placeholder - in real app, render actual QR */}

@@ -8,7 +8,7 @@ import PaywallModal from '@/components/PaywallModal'
 
 
 export default function Preview({ config, updateConfig }: any) {
-    const qrRef = useRef(null)
+    const qrRef = useRef<any>(null)
     const [qrCode] = useState(new QRCodeStyling({
         width: 2000,
         height: 2000,
@@ -70,7 +70,7 @@ export default function Preview({ config, updateConfig }: any) {
         return () => clearTimeout(timer)
     }, [config, qrCode])
 
-    const handleDownload = (format) => {
+    const handleDownload = (format: any) => {
         // PRO USER: Instant download, no watermark
         if (config.hasPaid) {
             qrCode.download({
@@ -82,7 +82,7 @@ export default function Preview({ config, updateConfig }: any) {
 
         // FREE USER: Add watermark
         if (format === 'png') {
-            qrCode.getRawData("png").then((blob) => {
+            qrCode.getRawData("png").then((blob: any) => {
                 const url = URL.createObjectURL(blob)
                 const img = new Image()
                 img.onload = () => {
@@ -92,42 +92,46 @@ export default function Preview({ config, updateConfig }: any) {
                     canvas.height = img.height + watermarkHeight
                     const ctx = canvas.getContext("2d")
 
-                    // Draw white background
-                    ctx.fillStyle = "#ffffff"
-                    ctx.fillRect(0, 0, canvas.width, canvas.height)
+                    if (ctx) {
+                        // Draw white background
+                        ctx.fillStyle = "#ffffff"
+                        ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-                    // Draw the QR code image on top
-                    ctx.drawImage(img, 0, 0)
+                        // Draw the QR code image on top
+                        ctx.drawImage(img, 0, 0)
 
-                    // Draw the watermark bar below the QR
-                    ctx.fillStyle = "#f4f4f8"
-                    ctx.fillRect(0, img.height, canvas.width, watermarkHeight)
+                        // Draw the watermark bar below the QR
+                        ctx.fillStyle = "#f4f4f8"
+                        ctx.fillRect(0, img.height, canvas.width, watermarkHeight)
 
-                    ctx.fillStyle = "#9999bb"
-                    ctx.font = "500 11px 'DM Sans', sans-serif"
-                    ctx.textAlign = "center"
-                    ctx.textBaseline = "middle"
-                    ctx.fillText(
-                        "Made with qrcraft.fun",
-                        canvas.width / 2,
-                        img.height + watermarkHeight / 2
-                    )
+                        ctx.fillStyle = "#9999bb"
+                        ctx.font = "500 11px 'DM Sans', sans-serif"
+                        ctx.textAlign = "center"
+                        ctx.textBaseline = "middle"
+                        ctx.fillText(
+                            "Made with qrcraft.fun",
+                            canvas.width / 2,
+                            img.height + watermarkHeight / 2
+                        )
+                    }
 
-                    canvas.toBlob((outputBlob) => {
-                        const downloadUrl = URL.createObjectURL(outputBlob)
-                        const a = document.createElement("a")
-                        a.href = downloadUrl
-                        a.download = "qrcraft-free.png"
-                        a.click()
-                        URL.revokeObjectURL(downloadUrl)
-                        URL.revokeObjectURL(url)
+                    canvas.toBlob((outputBlob: any) => {
+                        if (outputBlob) {
+                            const downloadUrl = URL.createObjectURL(outputBlob)
+                            const a = document.createElement("a")
+                            a.href = downloadUrl
+                            a.download = "qrcraft-free.png"
+                            a.click()
+                            URL.revokeObjectURL(downloadUrl)
+                            URL.revokeObjectURL(url)
+                        }
                     }, "image/png")
                 }
                 img.src = url
             })
         } else if (format === 'svg') {
-            qrCode.getRawData("svg").then((blob) => {
-                blob.text().then(svgText => {
+            qrCode.getRawData("svg").then((blob: any) => {
+                blob.text().then((svgText: any) => {
                     const qrSize = 2000 // Based on init config
                     const watermarkSvg = `
                         <rect x="0" y="${qrSize}" width="${qrSize}" height="24" fill="#f4f4f8"/>
@@ -143,11 +147,11 @@ export default function Preview({ config, updateConfig }: any) {
                     // Inject before closing tag
                     const newSvgText = svgText.replace('</svg>', `${watermarkSvg}</svg>`)
                     // Update viewBox to include watermark
-                    const updatedSvgText = newSvgText.replace(/viewBox="0 0 (\d+) (\d+)"/, (match, w, h) => {
+                    const updatedSvgText = newSvgText.replace(/viewBox="0 0 (\d+) (\d+)"/, (match: any, w: any, h: any) => {
                         return `viewBox="0 0 ${w} ${parseInt(h) + 24}"`
                     })
                     // Update height attribute
-                    const finalSvgText = updatedSvgText.replace(/height="(\d+)"/, (match, h) => {
+                    const finalSvgText = updatedSvgText.replace(/height="(\d+)"/, (match: any, h: any) => {
                         return `height="${parseInt(h) + 24}"`
                     })
 

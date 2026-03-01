@@ -43,7 +43,7 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
     }, [wifiSsid, wifiPass, config.qrType])
 
 
-    const handleLogoUpload = (e) => {
+    const handleLogoUpload = (e: any) => {
         const file = e.target.files[0]
         if (file) {
             const reader = new FileReader()
@@ -71,7 +71,7 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
                 destination: localContent, // The actual destination
                 createdAt: new Date().toISOString()
             }
-            setDynamicCodes(prev => [newCode, ...prev])
+            setDynamicCodes((prev: any) => [newCode, ...prev])
         }
 
         setHasGeneratedDynamic(true)
