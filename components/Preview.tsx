@@ -9,16 +9,20 @@ import PaywallModal from '@/components/PaywallModal'
 
 export default function Preview({ config, updateConfig }: any) {
     const qrRef = useRef<any>(null)
-    const [qrCode] = useState(new QRCodeStyling({
-        width: 2000,
-        height: 2000,
-        type: "svg",
-        data: "https://qr-customizer.com",
-        image: "",
-        dotsOptions: { color: "#7C6EFA", type: "rounded" },
-        backgroundOptions: { color: "#ffffff" },
-        imageOptions: { crossOrigin: "anonymous", margin: 20 }
-    }))
+    const [qrCode, setQrCode] = useState<any>(null)
+
+    useEffect(() => {
+        setQrCode(new QRCodeStyling({
+            width: 2000,
+            height: 2000,
+            type: "svg",
+            data: "https://qr-customizer.com",
+            image: "",
+            dotsOptions: { color: "#7C6EFA", type: "rounded" },
+            backgroundOptions: { color: "#ffffff" },
+            imageOptions: { crossOrigin: "anonymous", margin: 20 }
+        }))
+    }, [])
     const [showPaywall, setShowPaywall] = useState(false)
     const [isUpdating, setIsUpdating] = useState(false) // Used for blink animation
 
@@ -30,6 +34,7 @@ export default function Preview({ config, updateConfig }: any) {
     }, [config.triggerPaywall, updateConfig])
 
     useEffect(() => {
+        if (!qrCode) return;
         if (qrRef.current) {
             qrRef.current.innerHTML = ''
             qrCode.append(qrRef.current)
@@ -38,6 +43,7 @@ export default function Preview({ config, updateConfig }: any) {
 
     // QR Update Logic with blink animation
     useEffect(() => {
+        if (!qrCode) return;
         setIsUpdating(true)
 
         // Tiny delay to allow fade-out effect before update visually completes
@@ -71,6 +77,7 @@ export default function Preview({ config, updateConfig }: any) {
     }, [config, qrCode])
 
     const handleDownload = (format: any) => {
+        if (!qrCode) return;
         // PRO USER: Instant download, no watermark
         if (config.hasPaid) {
             qrCode.download({
