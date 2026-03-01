@@ -4,6 +4,7 @@ export default function SignUpPage() {
     return (
         <SignUp
             path="/auth/signup"
+            routing="path"
             appearance={{
                 elements: {
                     rootBox: "w-full mx-auto",

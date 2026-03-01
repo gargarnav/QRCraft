@@ -4,6 +4,7 @@ export default function LoginPage() {
     return (
         <SignIn
             path="/auth/login"
+            routing="path"
             appearance={{
                 elements: {
                     rootBox: "w-full mx-auto",
