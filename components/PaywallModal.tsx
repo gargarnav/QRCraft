@@ -1,3 +1,4 @@
+"use client";
 // @ts-nocheck
 export default function PaywallModal({ isOpen, onClose }: any) {
     if (!isOpen) return null

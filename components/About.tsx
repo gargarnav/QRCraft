@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck// @ts-nocheck
+// @ts-nocheck
 
 
 import React from 'react'
