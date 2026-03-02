@@ -5,12 +5,18 @@
 import { useEffect, useRef, useState } from 'react'
 import QRCodeStyling from 'qr-code-styling'
 import PaywallModal from '@/components/PaywallModal'
+import { useProfile } from '@/hooks/useProfile'
+import { PLANS, PlanType } from '@/lib/plans'
 
 
 export default function Preview({ config, updateConfig }: any) {
     const qrRef = useRef<any>(null)
     const [qrCode, setQrCode] = useState<any>(null)
     const [isSaving, setIsSaving] = useState(false)
+
+    const { profile } = useProfile()
+    const currentPlan = (profile?.plan || 'free') as PlanType
+    const planLimits = PLANS[currentPlan]?.limits || PLANS.free.limits
 
     useEffect(() => {
         setQrCode(new QRCodeStyling({
@@ -26,11 +32,13 @@ export default function Preview({ config, updateConfig }: any) {
     }, [])
     const [showPaywall, setShowPaywall] = useState(false)
     const [paywallMessage, setPaywallMessage] = useState("")
+    const [paywallTarget, setPaywallTarget] = useState<string | undefined>(undefined)
     const [isUpdating, setIsUpdating] = useState(false) // Used for blink animation
 
     useEffect(() => {
         if (config.triggerPaywall) {
             setPaywallMessage(config.paywallMessage || "")
+            setPaywallTarget(undefined)
             setShowPaywall(true)
             updateConfig('triggerPaywall', false)
             updateConfig('paywallMessage', '')
@@ -143,44 +151,81 @@ export default function Preview({ config, updateConfig }: any) {
             })
         } else if (format === 'svg') {
             qrCode.getRawData("svg").then((blob: any) => {
-                blob.text().then((svgText: any) => {
-                    const qrSize = 2000 // Based on init config
-                    const watermarkSvg = `
-                        <rect x="0" y="${qrSize}" width="${qrSize}" height="24" fill="#f4f4f8"/>
-                        <text
-                            x="${qrSize / 2}"
-                            y="${qrSize + 16}"
-                            text-anchor="middle"
-                            font-family="DM Sans, sans-serif"
-                            font-size="11"
-                            fill="#9999bb"
-                        >Made with qrcraft.fun</text>`
+                let url;
+                // Add watermark for Free
+                if (!config.hasPaid) {
+                    blob.text().then((svgText: any) => {
+                        const qrSize = 2000 // Based on init config
+                        const watermarkSvg = `
+                            <rect x="0" y="${qrSize}" width="${qrSize}" height="24" fill="#f4f4f8"/>
+                            <text
+                                x="${qrSize / 2}"
+                                y="${qrSize + 16}"
+                                text-anchor="middle"
+                                font-family="DM Sans, sans-serif"
+                                font-size="11"
+                                fill="#9999bb"
+                            >Made with qrcraft.fun</text>`
 
-                    // Inject before closing tag
-                    const newSvgText = svgText.replace('</svg>', `${watermarkSvg}</svg>`)
-                    // Update viewBox to include watermark
-                    const updatedSvgText = newSvgText.replace(/viewBox="0 0 (\d+) (\d+)"/, (match: any, w: any, h: any) => {
-                        return `viewBox="0 0 ${w} ${parseInt(h) + 24}"`
-                    })
-                    // Update height attribute
-                    const finalSvgText = updatedSvgText.replace(/height="(\d+)"/, (match: any, h: any) => {
-                        return `height="${parseInt(h) + 24}"`
-                    })
+                        const newSvgText = svgText.replace('</svg>', `${watermarkSvg}</svg>`)
+                        const updatedSvgText = newSvgText.replace(/viewBox="0 0 (\d+) (\d+)"/, (match: any, w: any, h: any) => {
+                            return `viewBox="0 0 ${w} ${parseInt(h) + 24}"`
+                        })
+                        const finalSvgText = updatedSvgText.replace(/height="(\d+)"/, (match: any, h: any) => {
+                            return `height="${parseInt(h) + 24}"`
+                        })
 
-                    const newBlob = new Blob([finalSvgText], { type: "image/svg+xml" })
-                    const url = URL.createObjectURL(newBlob)
+                        const newBlob = new Blob([finalSvgText], { type: "image/svg+xml" })
+                        url = URL.createObjectURL(newBlob)
+                        const a = document.createElement("a")
+                        a.href = url
+                        a.download = "qrcraft-watermarked.svg"
+                        a.click()
+                        URL.revokeObjectURL(url)
+                    })
+                } else {
+                    url = URL.createObjectURL(blob)
                     const a = document.createElement("a")
                     a.href = url
-                    a.download = "qrcraft-free.svg"
+                    a.download = "qrcraft-code.svg"
                     a.click()
                     URL.revokeObjectURL(url)
-                })
+                }
+            })
+        } else if (format === 'pdf') {
+            // Placeholder: qrCode-styling doesn't natively do PDF, we just download it as SVG/PNG or mock
+            alert("PDF Generation unlocked! Processing...")
+            qrCode.getRawData("svg").then((blob: any) => {
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement("a")
+                a.href = url
+                a.download = "qrcraft-code.pdf"
+                a.click()
+                URL.revokeObjectURL(url)
             })
         }
     }
 
-    const handleDownload = async (format: any) => {
+    const isSvgLocked = !planLimits.svgDownload;
+    const isPdfLocked = !planLimits.pdfDownload;
+
+    const handleDownloadClick = (format: 'png' | 'svg' | 'pdf') => {
         if (!config.isGenerated || !config.content) return;
+
+        if (format === 'svg' && isSvgLocked) {
+            setPaywallMessage("Upgrade to Maker to unlock high-res SVGs.")
+            setPaywallTarget('maker')
+            setShowPaywall(true)
+            return
+        }
+
+        if (format === 'pdf' && isPdfLocked) {
+            setPaywallMessage("Upgrade to Pro to unlock PDF rendering.")
+            setPaywallTarget('pro')
+            setShowPaywall(true)
+            return
+        }
+
         setIsSaving(true);
         setTimeout(() => {
             processDownload(format);
@@ -190,7 +235,7 @@ export default function Preview({ config, updateConfig }: any) {
 
     return (
         <div className="flex flex-col items-center justify-center relative h-full w-full">
-            <PaywallModal isOpen={showPaywall} onClose={() => setShowPaywall(false)} message={paywallMessage} />
+            <PaywallModal isOpen={showPaywall} onClose={() => setShowPaywall(false)} message={paywallMessage} targetPlan={paywallTarget} />
 
             {/* QR Card */}
             <div className="relative mb-8 w-full max-w-[340px]">
@@ -281,31 +326,52 @@ export default function Preview({ config, updateConfig }: any) {
                         )}
                     </div>
 
-                    <button
-                        onClick={() => handleDownload('png')}
-                        disabled={isSaving}
-                        className="w-full btn-primary flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isSaving ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        ) : (
-                            <svg className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        )}
-                        {isSaving ? 'Processing...' : 'Download PNG'}
-                    </button>
+                    <div className="flex flex-col gap-3">
+                        <button
+                            onClick={() => handleDownloadClick('png')}
+                            disabled={isSaving}
+                            className="w-full btn-primary flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSaving ? (
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            ) : (
+                                <svg className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            )}
+                            {isSaving ? 'Processing...' : 'Download PNG'}
+                        </button>
 
-                    <button
-                        onClick={() => handleDownload('svg')}
-                        disabled={isSaving}
-                        className="w-full btn-secondary flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isSaving ? (
-                            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                        ) : (
-                            <svg className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        )}
-                        {isSaving ? 'Processing...' : 'Download SVG'}
-                    </button>
+                        <button
+                            onClick={() => handleDownloadClick('svg')}
+                            disabled={isSaving && !isSvgLocked}
+                            title={isSvgLocked ? "Upgrade to Maker to unlock SVG" : "Download SVG Vector"}
+                            className={`w-full flex items-center justify-center gap-2 group transition-all py-3 px-6 rounded-full font-bold text-sm text-center disabled:opacity-50 disabled:cursor-not-allowed ${isSvgLocked ? 'bg-dark border border-white/10 text-white/50 hover:bg-white/5' : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'}`}
+                        >
+                            {isSvgLocked ? (
+                                <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            ) : isSaving ? (
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            ) : (
+                                <svg className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            )}
+                            Download SVG
+                        </button>
+
+                        <button
+                            onClick={() => handleDownloadClick('pdf')}
+                            disabled={isSaving && !isPdfLocked}
+                            title={isPdfLocked ? "Upgrade to Pro to unlock PDF" : "Download PDF Document"}
+                            className={`w-full flex items-center justify-center gap-2 group transition-all py-3 px-6 rounded-full font-bold text-sm text-center disabled:opacity-50 disabled:cursor-not-allowed ${isPdfLocked ? 'bg-dark border border-white/10 text-white/50 hover:bg-white/5' : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'}`}
+                        >
+                            {isPdfLocked ? (
+                                <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            ) : isSaving ? (
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            ) : (
+                                <svg className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            )}
+                            Download PDF
+                        </button>
+                    </div>
 
                     {!config.hasPaid && (
                         <p className="text-[12px] text-textMuted text-center mt-4 pb-4">

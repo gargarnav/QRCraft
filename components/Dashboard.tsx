@@ -125,16 +125,16 @@ export default function Dashboard() {
             case 'maker': return <span className="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Maker ✦</span>
             case 'pro': return <span className="bg-purple-500/20 text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Pro ✦</span>
             case 'enterprise': return <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Enterprise ✦</span>
-            default: return <span className="bg-gray-500/20 text-gray-400 border border-gray-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Free Plan</span>
+            default: return <span className="bg-gray-500/20 text-gray-400 border border-gray-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Free</span>
         }
     }
 
     const getUsageStats = (plan: string, count: number) => {
         switch (plan) {
-            case 'maker': return `${count} / 25 QR Codes used`
+            case 'maker': return `${count} / 25 QR Codes / month`
             case 'pro':
-            case 'enterprise': return `${count} QR Codes created`
-            default: return `${count} / 3 QR Codes used`
+            case 'enterprise': return `${count} QR Codes created (Unlimited)`
+            default: return `${count} / 3 QR Codes used (Lifetime)`
         }
     }
 
@@ -163,13 +163,13 @@ export default function Dashboard() {
                                 </p>
                             </div>
 
-                            {(profile?.plan === 'free' || profile?.plan === 'maker' || !profile?.plan) ? (
-                                <Link href="/pricing" className="btn-primary py-2.5 px-6 text-sm w-full md:w-auto whitespace-nowrap text-center">
-                                    Upgrade Plan
-                                </Link>
+                            {((profile?.plan || 'free') === 'enterprise') ? (
+                                <div className="py-2.5 px-6 text-sm w-full md:w-auto text-success font-medium text-center">
+                                    You're on our best plan 🎉
+                                </div>
                             ) : (
-                                <Link href="/pricing" className="btn-secondary py-2.5 px-6 text-sm w-full md:w-auto whitespace-nowrap text-center">
-                                    Manage Subscription
+                                <Link href="/pricing" className={`py-2.5 px-6 text-sm w-full md:w-auto text-center rounded-full font-bold transition-all shadow-lg ${(profile?.plan === 'pro') ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-primary text-white hover:bg-primary-dim shadow-primary/20'}`}>
+                                    {(profile?.plan === 'pro') ? 'Upgrade to Enterprise' : (profile?.plan === 'maker') ? 'Upgrade to Pro' : 'Upgrade to Maker'}
                                 </Link>
                             )}
                         </div>

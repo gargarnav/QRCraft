@@ -5,7 +5,7 @@ export const profiles = pgTable("profiles", {
     email: text("email").notNull().unique(),
     fullName: text("full_name"),
     avatarUrl: text("avatar_url"),
-    plan: text("plan").default("free"), // 'free' | 'maker' | 'pro' | 'enterprise'
+    plan: text("plan").notNull().default("free"), // 'free' | 'maker' | 'pro' | 'enterprise'
     qrCodesCount: integer("qr_codes_count").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
@@ -40,7 +40,7 @@ export const scanEvents = pgTable("scan_events", {
 export const subscriptions = pgTable("subscriptions", {
     id: text("id").primaryKey(),
     userId: text("user_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
-    plan: text("plan").notNull(), // 'pro' | 'enterprise'
+    plan: text("plan").notNull(), // 'free' | 'maker' | 'pro' | 'enterprise'
     status: text("status").notNull(), // 'active' | 'cancelled' | 'past_due'
     paymentProvider: text("payment_provider").notNull(), // 'razorpay'
     providerSubscriptionId: text("provider_subscription_id").notNull(),

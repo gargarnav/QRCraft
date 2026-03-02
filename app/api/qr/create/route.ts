@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { profiles, qrCodes } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { PLANS, PlanType } from "@/lib/plans";
 
 export async function POST(req: NextRequest) {
     console.log("QR Create API called");
@@ -47,26 +48,35 @@ export async function POST(req: NextRequest) {
         }
         console.log("Profile:", profile);
 
-        // Enforce plan limits
-        if (profile.plan === "free" || !profile.plan) {
-            const currentCount = profile.qrCodesCount ?? 0;
-            if (currentCount >= 3) {
-                return NextResponse.json({ error: "LIMIT_REACHED", message: "Free plan allows a maximum of 3 QR codes." }, { status: 403 });
-            }
-            if (type === "dynamic") {
-                return NextResponse.json({ error: "DYNAMIC_NOT_ALLOWED" }, { status: 403 });
-            }
-        } else if (profile.plan === "maker") {
-            if (type === "dynamic") {
-                const [result] = await db
-                    .select({ count: sql<number>`count(*)` })
-                    .from(qrCodes)
-                    .where(sql`${qrCodes.userId} = ${userId} AND ${qrCodes.type} = 'dynamic'`);
+        const planName = (profile.plan || 'free') as PlanType;
+        const limits = PLANS[planName].limits;
 
-                if (Number(result.count) >= 10) {
-                    return NextResponse.json({ error: "LIMIT_REACHED", message: "Maker plan allows a maximum of 10 dynamic QR codes." }, { status: 403 });
+        // Dynamic checks
+        if (type === 'dynamic' && limits.dynamicQRCodes === 0) {
+            return NextResponse.json({ error: "DYNAMIC_NOT_ALLOWED" }, { status: 403 });
+        }
+
+        if (type === 'dynamic' && limits.dynamicQRCodes !== Infinity) {
+            const [result] = await db
+                .select({ count: sql<number>`count(*)` })
+                .from(qrCodes)
+                .where(sql`${qrCodes.userId} = ${userId} AND ${qrCodes.type} = 'dynamic'`);
+
+            if (Number(result.count) >= limits.dynamicQRCodes) {
+                return NextResponse.json({ error: "LIMIT_REACHED", message: `${PLANS[planName].name} plan allows a maximum of ${limits.dynamicQRCodes} dynamic QR codes.` }, { status: 403 });
+            }
+        }
+
+        // Static limits logic
+        if (type === 'static' && limits.staticQRCodes !== Infinity) {
+            if (planName === 'free') {
+                // Lifetime check for Free
+                const currentCount = profile.qrCodesCount ?? 0;
+                if (currentCount >= limits.staticQRCodes) {
+                    return NextResponse.json({ error: "LIMIT_REACHED", message: `${PLANS[planName].name} plan allows a maximum of ${limits.staticQRCodes} QR codes.` }, { status: 403 });
                 }
             } else {
+                // Monthly execution limits for Maker
                 const startOfMonth = new Date();
                 startOfMonth.setDate(1);
                 startOfMonth.setHours(0, 0, 0, 0);
@@ -76,10 +86,15 @@ export async function POST(req: NextRequest) {
                     .from(qrCodes)
                     .where(sql`${qrCodes.userId} = ${userId} AND ${qrCodes.type} = 'static' AND ${qrCodes.createdAt} >= ${startOfMonth}`);
 
-                if (Number(result.count) >= 25) {
-                    return NextResponse.json({ error: "LIMIT_REACHED", message: "Maker plan allows a maximum of 25 static QR codes per month." }, { status: 403 });
+                if (Number(result.count) >= limits.staticQRCodes) {
+                    return NextResponse.json({ error: "LIMIT_REACHED", message: `${PLANS[planName].name} plan allows a maximum of ${limits.staticQRCodes} static QR codes per month.` }, { status: 403 });
                 }
             }
+        }
+
+        // Feature Limits
+        if (config?.logo && !limits.logoUpload) {
+            return NextResponse.json({ error: "LOGO_NOT_ALLOWED" }, { status: 403 });
         }
         // Pro and Enterprise plans have unlimited generation.
 
