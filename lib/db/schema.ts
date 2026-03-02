@@ -6,7 +6,7 @@ export const profiles = pgTable("profiles", {
     fullName: text("full_name"),
     avatarUrl: text("avatar_url"),
     plan: text("plan").default("free"), // 'free' | 'maker' | 'pro' | 'enterprise'
-    qrCodesCount: integer("qr_codes_count").default(0),
+    qrCodesCount: integer("qr_codes_count").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
 });
