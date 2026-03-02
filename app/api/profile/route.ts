@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -46,3 +46,39 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: "Invalid data", details: error }, { status: 400 });
     }
 }
+
+export async function POST() {
+    const { userId } = await auth();
+    if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const user = await currentUser();
+        const email = user?.emailAddresses?.[0]?.emailAddress || '';
+        const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '';
+
+        const existingProfile = await db.query.profiles.findFirst({
+            where: eq(profiles.id, userId),
+        });
+
+        if (existingProfile) {
+            return NextResponse.json(existingProfile, { status: 200 });
+        }
+
+        const [newProfile] = await db.insert(profiles).values({
+            id: userId,
+            email: email,
+            fullName: fullName || null,
+            avatarUrl: user?.imageUrl || null,
+            plan: "free",
+            qrCodesCount: 0,
+        }).returning();
+
+        return NextResponse.json(newProfile, { status: 201 });
+    } catch (error) {
+        console.error("Failed to POST create profile", error);
+        return NextResponse.json({ error: "Failed to create profile", details: error }, { status: 500 });
+    }
+}
+

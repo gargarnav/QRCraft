@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
@@ -15,18 +15,28 @@ export default async function DashboardLayout({
         redirect("/auth/login");
     }
 
-    const profile = await db.query.profiles.findFirst({
+    let profile = await db.query.profiles.findFirst({
         where: eq(profiles.id, userId),
     });
 
     if (!profile) {
-        // Show a loading skeleton while profile is being handled by webhook
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-300">
-                <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
-                <p>Setting up your profile...</p>
-            </div>
-        );
+        console.log("Profile not found in layout, attempting inline creation");
+        try {
+            const user = await currentUser();
+            const email = user?.emailAddresses?.[0]?.emailAddress || '';
+            const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '';
+
+            [profile] = await db.insert(profiles).values({
+                id: userId,
+                email: email,
+                fullName: fullName || null,
+                plan: "free",
+                qrCodesCount: 0,
+            }).returning();
+        } catch (error) {
+            console.error("Error creating inline profile:", error);
+            // Even if it fails, don't block the UI forever.
+        }
     }
 
     return (

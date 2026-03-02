@@ -36,13 +36,24 @@ export default function Dashboard() {
 
         const fetchProfile = async () => {
             try {
-                const response = await fetch('/api/profile')
-                if (response.ok) {
+                let response = await fetch('/api/profile')
+                if (response.status === 404) {
+                    console.log("Profile not found remotely, requesting dynamic creation...");
+                    const postRes = await fetch('/api/profile', { method: 'POST' });
+                    if (postRes.ok) {
+                        const data = await postRes.json();
+                        setProfile(data);
+                    } else {
+                        throw new Error(`Profile creation failed with status: ${postRes.status}`);
+                    }
+                } else if (response.ok) {
                     const data = await response.json()
                     setProfile(data)
+                } else {
+                    throw new Error(`Profile fetch failed with status: ${response.status}`);
                 }
             } catch (err) {
-                console.error("Failed to load profile", err)
+                console.warn("Failed to load profile", err)
             } finally {
                 setIsProfileLoading(false)
             }
@@ -50,6 +61,13 @@ export default function Dashboard() {
 
         fetchQRCodes()
         fetchProfile()
+
+        const safetyNet = setTimeout(() => {
+            setIsLoading(false)
+            setIsProfileLoading(false)
+        }, 5000)
+
+        return () => clearTimeout(safetyNet)
     }, [])
 
     const handleDelete = async (id: string) => {
