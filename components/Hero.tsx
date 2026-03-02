@@ -4,9 +4,9 @@
 
 import { useEffect, useRef } from 'react'
 import QRCodeStyling from 'qr-code-styling'
+import Link from 'next/link'
 
-
-export default function Hero({ setCurrentPage }: any) {
+export default function Hero() {
     const qrRef = useRef<any>(null)
 
     useEffect(() => {
@@ -36,10 +36,6 @@ export default function Hero({ setCurrentPage }: any) {
         }
     }, [])
 
-    const scrollToTool = () => {
-        document.getElementById('tool')?.scrollIntoView({ behavior: 'smooth' })
-    }
-
     return (
         <section className="relative pt-12 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
             {/* Radial Gradient Background */}
@@ -67,9 +63,9 @@ export default function Hero({ setCurrentPage }: any) {
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8 animate-fade-in" style={{ animationDelay: '440ms' }}>
-                            <button onClick={scrollToTool} className="btn-primary text-lg px-9 py-4 shadow-glow ring-4 ring-primary/20">
+                            <Link href="/generate" className="btn-primary text-lg px-9 py-4 shadow-glow ring-4 ring-primary/20 inline-block text-center">
                                 Create My QR Code — It's Free
-                            </button>
+                            </Link>
                         </div>
 
                         <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-textMuted font-medium animate-fade-in" style={{ animationDelay: '500ms' }}>

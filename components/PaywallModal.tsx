@@ -3,7 +3,7 @@
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_LINK_HERE"
 
-export default function PaywallModal({ isOpen, onClose }: any) {
+export default function PaywallModal({ isOpen, onClose, message }: any) {
     if (!isOpen) return null
 
     return (
@@ -25,7 +25,7 @@ export default function PaywallModal({ isOpen, onClose }: any) {
 
                     <h2 className="text-2xl font-syne font-bold text-white mb-3">Unlock Full Quality</h2>
                     <p className="text-textSecondary text-[15px] leading-relaxed">
-                        Get high-resolution PNG & SVG files, remove the watermark, and add your logo.
+                        {message || "Get high-resolution PNG & SVG files, remove the watermark, and add your logo."}
                     </p>
                 </div>
 

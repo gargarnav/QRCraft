@@ -31,7 +31,9 @@ const mockCountries = [
 
 
 
-export default function Analytics({ hasPaid, setCurrentPage }: any) {
+import Link from 'next/link';
+
+export default function Analytics({ hasPaid }: any) {
     if (!hasPaid) {
         return (
             <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
@@ -41,9 +43,9 @@ export default function Analytics({ hasPaid, setCurrentPage }: any) {
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-4">Analytics Locked</h2>
                     <p className="text-textSecondary mb-8">Upgrade to Pro+ to see detailed scan analytics including device type, location, and time.</p>
-                    <button onClick={() => setCurrentPage('home')} className="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-primary-dim transition-colors">
-                        Go Back
-                    </button>
+                    <Link href="/generate" className="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-primary-dim transition-colors inline-block mt-4">
+                        Create QR Code
+                    </Link>
                     {/* Note: In a real app, this would trigger the PaywallModal */}
                 </div>
             </div>

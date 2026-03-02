@@ -1,7 +1,15 @@
-import { redirect } from 'next/navigation';
+import Dashboard from '@/components/Dashboard';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function DashboardPage() {
-    // Our app is a single-page application built on /app/page.tsx
-    // We use the ?tab=dashboard URL query to tell the home page to render the dashboard view
-    redirect('/?tab=dashboard');
+    return (
+        <div className="bg-dark text-textLight min-h-screen font-inter">
+            <Header />
+            <main>
+                <Dashboard />
+            </main>
+            <Footer />
+        </div>
+    );
 }

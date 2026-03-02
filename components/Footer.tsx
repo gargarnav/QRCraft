@@ -2,14 +2,9 @@
 "use client";
 
 
+import Link from 'next/link'
 
-export default function Footer({ setCurrentPage }: any) {
-    const scrollToSection = (id: string) => {
-        const element = document.getElementById(id)
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' })
-        }
-    }
+export default function Footer() {
 
     return (
         <footer className="bg-[#05050A] border-t border-white/5 pt-20 pb-12">
@@ -35,8 +30,8 @@ export default function Footer({ setCurrentPage }: any) {
                     <div>
                         <h4 className="font-syne font-bold text-white mb-6">Product</h4>
                         <ul className="space-y-3 text-sm text-textMuted">
-                            <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-primary transition-colors">Home</button></li>
-                            <li><button onClick={() => scrollToSection('pricing')} className="hover:text-primary transition-colors">Pricing</button></li>
+                            <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
+                            <li><Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
                             <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
                             <li><a href="#" className="hover:text-primary transition-colors">Changelog</a></li>
                         </ul>

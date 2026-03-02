@@ -14,10 +14,7 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
     const [wifiSsid, setWifiSsid] = useState('')
     const [wifiPass, setWifiPass] = useState('')
 
-    // Dynamic QR State
-    const [isDynamic, setIsDynamic] = useState(false)
-    const [qrName, setQrName] = useState('')
-    const [hasGeneratedDynamic, setHasGeneratedDynamic] = useState(false)
+    // Removed local state: isDynamic, qrName, hasGeneratedDynamic - these are now in config
 
     useEffect(() => {
         setLocalContent(config.content)
@@ -25,7 +22,7 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
 
     useEffect(() => {
         // Debounce content updates only if NOT dynamic (because dynamic updates manually)
-        if (!isDynamic) {
+        if (!config.isDynamic) {
             const timer = setTimeout(() => {
                 if (config.qrType !== 'wifi') {
                     updateConfig('content', localContent)
@@ -33,7 +30,7 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
             }, 300)
             return () => clearTimeout(timer)
         }
-    }, [localContent, config.qrType, isDynamic])
+    }, [localContent, config.qrType, config.isDynamic])
 
     useEffect(() => {
         if (config.qrType === 'wifi') {
@@ -55,27 +52,74 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
         }
     }
 
-    const handleCreateDynamic = () => {
-        const shortcode = nanoid(6)
-        const redirectUrl = `https://qrcraft.fun/r/${shortcode}`
+    const handleGenerate = async () => {
+        if (!config.content) return;
 
-        // Update QR content to the short URL
-        updateConfig('content', redirectUrl)
-        setLocalContent(redirectUrl)
+        updateConfig('isSaving', true)
+        updateConfig('saveStatus', 'saving')
 
-        // Save to "Simulated DB"
-        if (setDynamicCodes) {
-            const newCode = {
-                shortcode,
-                name: qrName || 'Untitled Dynamic QR',
-                destination: localContent, // The actual destination
-                createdAt: new Date().toISOString()
+        try {
+            const isDynamic = config.isDynamic && config.qrType === 'url';
+            const defaultName = `${config.qrType.toUpperCase()} QR - ${new Date().toLocaleDateString()}`
+
+            const payload = {
+                name: config.qrName || defaultName,
+                qrType: config.qrType,
+                type: isDynamic ? 'dynamic' : 'static',
+                data: config.content,
+                destinationUrl: isDynamic ? (config.destinationUrl || config.content) : null,
+                config: {
+                    dotStyle: config.dotStyle,
+                    cornerStyle: config.cornerStyle,
+                    fgColor: config.fgColor,
+                    bgColor: config.bgColor,
+                    errorCorrection: config.errorCorrection,
+                    logo: config.logo
+                }
             }
-            setDynamicCodes((prev: any) => [newCode, ...prev])
-        }
 
-        setHasGeneratedDynamic(true)
-        // TODO: Save to database via POST /api/qr/create-dynamic
+            console.log("Full Payload before POST /api/qr/create:", payload);
+
+            const response = await fetch('/api/qr/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+
+            const data = await response.json()
+
+            if (response.status === 403) {
+                if (data.error === 'LIMIT_REACHED') {
+                    updateConfig('paywallMessage', "You've reached your free limit of 3 QR codes. Upgrade to create unlimited QRs.")
+                    updateConfig('triggerPaywall', true)
+                    updateConfig('saveStatus', 'idle')
+                } else if (data.error === 'DYNAMIC_NOT_ALLOWED') {
+                    updateConfig('paywallMessage', "Dynamic QR codes are a Pro feature. Upgrade to create editable QRs.")
+                    updateConfig('triggerPaywall', true)
+                    updateConfig('saveStatus', 'idle')
+                }
+                return // Block generation entirely
+            }
+
+            if (!response.ok) {
+                console.error("Failed to save QR to DB:", data)
+                updateConfig('saveStatus', 'error')
+                updateConfig('isGenerated', true)
+            } else {
+                updateConfig('saveStatus', 'saved')
+                updateConfig('isGenerated', true)
+                if (isDynamic && data.shortCode) {
+                    const shortUrl = `${window.location.protocol}//${window.location.host}/r/${data.shortCode}`
+                    updateConfig('shortUrl', shortUrl)
+                }
+            }
+        } catch (error) {
+            console.error("Error creating QR code:", error)
+            updateConfig('saveStatus', 'error')
+            updateConfig('isGenerated', true)
+        } finally {
+            updateConfig('isSaving', false)
+        }
     }
 
     // Common input classes
@@ -92,7 +136,10 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
                     {['url', 'text', 'wifi', 'email', 'phone'].map(type => (
                         <button
                             key={type}
-                            onClick={() => updateConfig('qrType', type)}
+                            onClick={() => {
+                                updateConfig('qrType', type)
+                                if (type !== 'url') updateConfig('isDynamic', false)
+                            }}
                             className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all capitalize whitespace-nowrap ${config.qrType === type
                                 ? 'bg-primary text-white shadow-md'
                                 : 'text-textMuted hover:text-white hover:bg-white/5'
@@ -106,10 +153,10 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
 
             {/* DYNAMIC QR TOGGLE (Only for URL type) */}
             {config.qrType === 'url' && (
-                <div className={`p-4 rounded-xl border transition-all ${isDynamic ? 'bg-primary/5 border-primary' : 'bg-dark-raised border-border'}`}>
+                <div className={`p-4 rounded-xl border transition-all ${config.isDynamic ? 'bg-primary/5 border-primary' : 'bg-dark-raised border-border'}`}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDynamic ? 'bg-primary text-white' : 'bg-dark border border-border text-textMuted'}`}>
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${config.isDynamic ? 'bg-primary text-white' : 'bg-dark border border-border text-textMuted'}`}>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             <div>
@@ -118,26 +165,20 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
                             </div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" checked={isDynamic} onChange={() => setIsDynamic(!isDynamic)} />
+                            <input type="checkbox" className="sr-only peer" checked={config.isDynamic} onChange={() => updateConfig('isDynamic', !config.isDynamic)} />
                             <div className="w-11 h-6 bg-dark-raised peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </label>
                     </div>
 
-                    {isDynamic && (
+                    {config.isDynamic && (
                         <div className="mt-4 space-y-3 animate-fade-in">
                             <input
                                 type="text"
                                 placeholder="QR Name (e.g. Menu)"
-                                value={qrName}
-                                onChange={(e) => setQrName(e.target.value)}
+                                value={config.qrName}
+                                onChange={(e) => updateConfig('qrName', e.target.value)}
                                 className={inputClass}
                             />
-                            {hasGeneratedDynamic && (
-                                <div className="text-green-400 text-xs flex items-center gap-1 bg-green-400/10 p-2 rounded-lg border border-green-400/20">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                                    Dynamic QR created! Check Dashboard.
-                                </div>
-                            )}
                         </div>
                     )}
                 </div>
@@ -173,8 +214,15 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
                     <div className="space-y-3">
                         <input
                             type="text"
-                            value={localContent}
-                            onChange={(e) => setLocalContent(e.target.value)}
+                            value={config.isDynamic ? (config.destinationUrl || config.content || '') : localContent}
+                            onChange={(e) => {
+                                if (config.isDynamic) {
+                                    updateConfig('destinationUrl', e.target.value)
+                                    updateConfig('content', e.target.value)
+                                } else {
+                                    setLocalContent(e.target.value)
+                                }
+                            }}
                             placeholder={
                                 config.qrType === 'url' ? 'https://yourwebsite.com' :
                                     config.qrType === 'email' ? 'name@example.com' :
@@ -182,14 +230,6 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
                             }
                             className={inputClass}
                         />
-                        {isDynamic && !hasGeneratedDynamic && (
-                            <button
-                                onClick={handleCreateDynamic}
-                                className="w-full bg-primary hover:bg-primary-dim text-white font-bold py-3 rounded-xl transition-all shadow-glow hover:shadow-glow-strong"
-                            >
-                                Generate Dynamic QR
-                            </button>
-                        )}
                     </div>
                 )}
             </div>
@@ -367,6 +407,24 @@ export default function Controls({ config, updateConfig, dynamicCodes, setDynami
                         </button>
                     ))}
                 </div>
+            </div>
+
+            {/* Generate Button */}
+            <div className="pt-4 border-t border-border mt-4">
+                <button
+                    onClick={handleGenerate}
+                    disabled={!config.content || config.isSaving}
+                    className="w-full bg-primary hover:bg-primary-light text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+                >
+                    {config.isSaving ? (
+                        <>
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            Generating & Saving...
+                        </>
+                    ) : (
+                        'Generate QR Code'
+                    )}
+                </button>
             </div>
 
         </div>

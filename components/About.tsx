@@ -5,7 +5,7 @@
 import React from 'react'
 
 
-export default function About({ setCurrentPage }: any) {
+export default function About() {
     return (
         <div className="bg-dark text-textLight min-h-screen">
             {/* HER0 SECTION */}

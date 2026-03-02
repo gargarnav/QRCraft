@@ -11,11 +11,27 @@ export function useQRConfig() {
         cornerStyle: "square",
         logo: null, // base64 string
         errorCorrection: "M",
-        hasPaid: false
+        hasPaid: false,
+        // New fields for Dynamic QRs API
+        isDynamic: false,
+        qrName: "",
+        destinationUrl: "",
+        shortUrl: "",
+
+        // Generate Flow
+        isGenerated: false,
+        isSaving: false,
+        saveStatus: "idle", // 'idle' | 'saving' | 'saved' | 'error'
     })
 
     const updateConfig = (key, value) => {
-        setConfig(prev => ({ ...prev, [key]: value }))
+        setConfig(prev => {
+            const systemKeys = ['isGenerated', 'isSaving', 'saveStatus', 'triggerPaywall', 'paywallMessage', 'hasPaid', 'shortUrl'];
+            if (!systemKeys.includes(key)) {
+                return { ...prev, [key]: value, isGenerated: false, saveStatus: 'idle' };
+            }
+            return { ...prev, [key]: value };
+        });
     }
 
     return { config, updateConfig, setConfig }
